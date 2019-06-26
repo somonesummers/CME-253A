@@ -17,6 +17,9 @@ dt  = min([dx,dy])/sqrt(k/rho)/2.1;
 x    = zeros((nx  )*(ny  ),1);
 y    = zeros((nx  )*(ny  ),1);
 P    = zeros((nx  )*(ny  ),1);
+Tyy    = zeros((nx  )*(ny  ),1);
+Txx    = zeros((nx  )*(ny  ),1);
+Txy    = zeros((nx  )*(ny  ),1);
 Pini = zeros((nx  )*(ny  ),1);
 Vx   = zeros((nx+1)*(ny  ),1);
 Vy   = zeros((nx  )*(ny+1),1);
@@ -26,6 +29,7 @@ for ix = 1:nx
         x(ix+(iy-1)*nx) = (ix-1)*dx + (-Lx+dx)/2;
         y(ix+(iy-1)*nx) = (iy-1)*dy + (-Ly+dy)/2;
         P(ix+(iy-1)*nx) = exp(-(x(ix+(iy-1)*nx)^2+y(ix+(iy-1)*nx)^2));
+        
         Pini(ix+(iy-1)*nx)=P(ix+(iy-1)*nx);
     end
 end
