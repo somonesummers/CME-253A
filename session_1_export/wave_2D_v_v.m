@@ -4,14 +4,14 @@ Lx  = 10;
 Ly  = 10;
 k   = 1;
 rho = 1;
-G   = 1;
+mu   = 1;
 % Numerics
 nx  = 100;
 ny  = 100;
 dx  = Lx/nx;
 dy  = Ly/ny;
 nt  = 200;
-dt  = min([dx,dy])/sqrt((k+4/3*G)/rho)/2.1;
+dt  = min([dx,dy])/sqrt((k)/rho)/2.1;
 % Initial arrays
 x   = (-Lx+dx)/2:dx:(Lx-dx)/2;
 y   = (-Ly+dy)/2:dy:(Ly-dy)/2;
@@ -34,12 +34,12 @@ for it = 1:nt
     div = diff(Vx,1,1)/dx + diff(Vy,1,2)/dy;
     P = P - dt*(div)*k;
     %Taus
-    Txx = Txx + 2*G*dt*(diff(Vx,1,1)/dx - div/3);
-    Tyy = Tyy + 2*G*dt*(diff(Vy,1,2)/dy - div/3);
+    Txx = 2*mu*(diff(Vx,1,1)/dx - div/3);
+    Tyy = 2*mu*(diff(Vy,1,2)/dy - div/3);
     %extend Velocities with BCs
     Vxe = [Vx(:,1),Vx,Vx(:,end)];
     Vye = [Vy(1,:);Vy;Vy(end,:)];
-    Txy = Txy + dt*G*(diff(Vxe,1,2)/dy + diff(Vye,1,1)/dx);
+    Txy = mu*(diff(Vxe,1,2)/dy + diff(Vye,1,1)/dx);
     Txyc = (Txy(1:end-1,1:end-1) + Txy(1:end-1,2:end) + ...
             Txy(2:end,1:end-1) + Txy(2:end,2:end))/4;
     %Velocities

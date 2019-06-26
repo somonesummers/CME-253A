@@ -6,14 +6,14 @@ Lx  = 10;
 Ly  = 10;
 k   = 10;
 rho = 1;
-G   = 1;
+mu   = 1;
 % Numerics
 nx  = 100;
 ny  = 100;
 dx  = Lx/nx;
 dy  = Ly/ny;
 nt  = 200;
-dt  = min([dx,dy])/sqrt((k+4/3*G)/rho)/2.1;
+dt  = min([dx,dy])/sqrt((k)/rho)/2.1;
 % Initial arrays
 x    = zeros((nx  )*(ny  ),1);
 y    = zeros((nx  )*(ny  ),1);
@@ -65,10 +65,10 @@ for it = 1:nt
             div = (Vx((ix+1)+(iy-1)*(nx+1))-Vx(ix+(iy-1)*(nx+1)))/dx+...
                   (Vy(ix+(iy)*(nx))-Vy(ix+(iy-1)*(nx)))/dy;
             P(ix+(iy-1)*nx) = P(ix+(iy-1)*nx) - dt*k*(div);
-            Txx(ix+(iy-1)*nx) = Txx(ix+(iy-1)*nx) + 2*G*dt*(...
+            Txx(ix+(iy-1)*nx) = 2*mu*(...
                     (Vx((ix+1)+(iy-1)*(nx+1))-Vx(ix+(iy-1)*(nx+1)))/dx - ...
                     1/3*(div));
-            Tyy(ix+(iy-1)*nx) = Tyy(ix+(iy-1)*nx) + 2*G*dt*(...
+            Tyy(ix+(iy-1)*nx) = 2*mu*(...
                     (Vy(ix+(iy)*(nx))-Vy(ix+(iy-1)*(nx)))/dy - ...
                     1/3*(div));
         end
@@ -76,7 +76,7 @@ for it = 1:nt
     %Txy Updates (shear stress at all bondaries = 0)
     for ix = 2:nx
         for iy = 2:ny
-            Txy(ix+(iy-1)*(nx+1)) = Txy(ix+(iy-1)*(nx+1)) + dt*G*(...
+            Txy(ix+(iy-1)*(nx+1)) = mu*(...
                    (Vx(ix+(iy-1)*(nx+1)) - Vx(ix+(iy-2)*(nx+1)))/dy + ...
                    (Vy(ix+(iy-1)*(nx)) - Vy((ix-1)+(iy-1)*(nx)))/dx);
         end
