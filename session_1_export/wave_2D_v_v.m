@@ -11,7 +11,7 @@ ny  = 100;
 dx  = Lx/nx;
 dy  = Ly/ny;
 nt  = 200;
-dt  = min([dx,dy])/sqrt((k)/rho)/2.1;
+dt  = min([dx,dy])/sqrt((k)/rho)/2.1; %TODO change to diffusion timescale
 % Initial arrays
 x   = (-Lx+dx)/2:dx:(Lx-dx)/2;
 y   = (-Ly+dy)/2:dy:(Ly-dy)/2;

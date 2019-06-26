@@ -13,7 +13,7 @@ ny  = 100;
 dx  = Lx/nx;
 dy  = Ly/ny;
 nt  = 200;
-dt  = min([dx,dy])/sqrt((k)/rho)/2.1;
+dt  = min([dx,dy])/sqrt((k)/rho)/2.1; %TODO change to diffusion timescale
 % Initial arrays
 x    = zeros((nx  )*(ny  ),1);
 y    = zeros((nx  )*(ny  ),1);
@@ -84,7 +84,7 @@ for it = 1:nt
     
     
     % Plot
-    figure(1),clf
+    figure(1)
     subplot(2,2,1)
     scatter(x,y,[20],P),title("Pressure " + it)
     axis equal
