@@ -1,7 +1,7 @@
 clear % Wave 2D loop
 % Physics
 Lx  = 10;
-Ly  = 10;
+Ly  = 4;
 k   = 1;
 rho = 1;
 mu   = 1;
@@ -10,8 +10,10 @@ nx  = 100;
 ny  = 100;
 dx  = Lx/nx;
 dy  = Ly/ny;
-nt  = 200;
-dt  = min([dx,dy])/sqrt((k)/rho)/2.1; %TODO change to diffusion timescale
+T = 3;
+dt  = min([dx,dy])^2/mu/4.1/3/4; 
+nt = round(T/dt)
+plot_step = round(.1/dt);
 % Initial arrays
 x   = (-Lx+dx)/2:dx:(Lx-dx)/2;
 y   = (-Ly+dy)/2:dy:(Ly-dy)/2;
@@ -52,30 +54,36 @@ for it = 1:nt
         diff(Tyy,1,2)/dy + ...
         diff(Txy(:,2:end-1),1,1)/dx);
     
-    
+    ttime = round(dt*it,2);
     % Plot
-    figure(1),clf
-    subplot(2,2,1)
-    pcolor(x2,y2,P),title("Pressure " + it)
-    axis equal
-    %caxis([-.3 .3])
-    colorbar
-    
-    subplot(2,2,2)
-    pcolor(x2,y2,Txx),title("Txx")
-    axis equal
-    colorbar
-    
-    subplot(2,2,3)
-    pcolor(x2,y2,Tyy),title("Tyy")
-    axis equal
-    colorbar
-    
-    subplot(2,2,4)
-    pcolor(x2e,y2e,Txy),title("Txy")
-    axis equal
-    colorbar
-    
-    drawnow
-    
+    if(mod(it,plot_step)==0)
+        figure(1),clf
+        subplot(2,2,1)
+        imagesc(x,y,P'),title("Pressure " + ttime)
+        axis equal
+        caxis([-.1 1])
+        colorbar
+
+        subplot(2,2,2)
+        imagesc(x,y,Txx'),title("Txx")
+        axis equal
+        %caxis([-.1 .1])
+        colorbar
+
+        subplot(2,2,3)
+        imagesc(x,y,Tyy'),title("Tyy")
+        axis equal
+        %caxis([-.1 .1])
+        colorbar
+
+        subplot(2,2,4)
+        imagesc(xe,ye,Txy'),title("Txy")
+        axis equal
+        %caxis([-.1 .1])
+        colorbar
+
+        drawnow
+        
+    end
 end
+save('p_v_v.mat','P');

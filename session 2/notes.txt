@@ -1,0 +1,13 @@
+GPU computing
+high memory bandwidth, great for PDEs
+Threading helps run parallel loops, massive acceleration of separate tasks
+more on performance next week
+limiter on stencil codes is memory bandwidth typically (24 bytes of memory for 2 flops in a derivative).
+flops isn't the modern limiter. (GPUs are TFlop/s, Gb/s so you can see memory boundedness of this)
+Being conservative with memory is key to performant code (matrix methods are bad at this)
+
+Programing GPUs CUDA
+
+building blocks  of: thread, block, grid
+1 thread per core roughly, this isn't quite true, but close enough. 
+

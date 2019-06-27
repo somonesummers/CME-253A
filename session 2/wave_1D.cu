@@ -7,10 +7,10 @@
 #include "cuda.h"
 
 #define DAT double
-#define GPU_ID     0
+#define GPU_ID     0 // typically 4 (0-3) on machines at stanford
 #define BLOCK_X    100
 #define GRID_X     1
-#define OVERLENGTH 1
+#define OVERLENGTH 1 //needed for extra staggered grid
 
 #define zeros(A,N)     DAT *A##_d,*A##_h; A##_h = (DAT*)malloc((N)*sizeof(DAT)); \
                        for(i=0; i < (N); i++){ A##_h[i]=(DAT)0.0; }              \

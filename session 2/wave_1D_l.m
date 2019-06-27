@@ -7,7 +7,7 @@ rho = 1;
 nx  = 100;
 dx  = Lx/nx;
 nt  = 200;
-dt  = dx/sqrt(k/rho)/2.1;
+dt  = min([dx,dy])^2/mu/2.1; 
 % Initial arrays
 x    = zeros(nx  ,1);
 P    = zeros(nx  ,1);

@@ -3,8 +3,8 @@
 clear % Wave 2D loop
 % Physics
 Lx  = 10;
-Ly  = 10;
-k   = 10;
+Ly  = 4;
+k   = 1;
 rho = 1;
 mu   = 1;
 % Numerics
@@ -12,8 +12,10 @@ nx  = 100;
 ny  = 100;
 dx  = Lx/nx;
 dy  = Ly/ny;
-nt  = 200;
-dt  = min([dx,dy])/sqrt((k)/rho)/2.1; %TODO change to diffusion timescale
+T = 3;
+dt  = min([dx,dy])^2/mu/4.1/3/4; 
+nt = round(T/dt)
+plot_step = round(.1/dt);
 % Initial arrays
 x    = zeros((nx  )*(ny  ),1);
 y    = zeros((nx  )*(ny  ),1);
@@ -81,30 +83,32 @@ for it = 1:nt
                    (Vy(ix+(iy-1)*(nx)) - Vy((ix-1)+(iy-1)*(nx)))/dx);
         end
     end
-    
-    
-    % Plot
-    figure(1)
-    subplot(2,2,1)
-    scatter(x,y,[20],P),title("Pressure " + it)
-    axis equal
-    %caxis([-.3 .3])
-    colorbar
-    
-    subplot(2,2,2)
-    scatter(x,y,[20],Txx),title("Txx")
-    axis equal
-    colorbar
-    
-    subplot(2,2,3)
-    scatter(x,y,[20],Tyy),title("Tyy")
-    axis equal
-    colorbar
-    
-    subplot(2,2,4)
-    scatter(xe,ye,[20],Txy),title("Txy")
-    axis equal
-    colorbar
-    
-    drawnow
+    ttime = round(dt*it,2);
+    if(mod(it,plot_step)==0)
+        % Plot
+        figure(2)
+        subplot(2,2,1)
+        scatter(x,y,[20],P),title("Pressure " + ttime)
+        axis equal
+        caxis([-.1 1])
+        colorbar
+
+        subplot(2,2,2)
+        scatter(x,y,[20],Txx),title("Txx")
+        axis equal
+        colorbar
+
+        subplot(2,2,3)
+        scatter(x,y,[20],Tyy),title("Tyy")
+        axis equal
+        colorbar
+
+        subplot(2,2,4)
+        scatter(xe,ye,[20],Txy),title("Txy")
+        axis equal
+        colorbar
+
+        drawnow
+    end
 end
+save('p_l_v.mat','P');
