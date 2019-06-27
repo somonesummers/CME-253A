@@ -24,36 +24,43 @@ Pini = zeros((nx  )*(ny  ),1);
 Vx   = zeros((nx+1)*(ny  ),1);
 Vy   = zeros((nx  )*(ny+1),1);
 % Initial conditions
+tic
 for ix = 1:nx
-    for iy = 1:ny
-        x(ix+(iy-1)*nx) = (ix-1)*dx + (-Lx+dx)/2;
-        y(ix+(iy-1)*nx) = (iy-1)*dy + (-Ly+dy)/2;
-        P(ix+(iy-1)*nx) = exp(-(x(ix+(iy-1)*nx)^2+y(ix+(iy-1)*nx)^2));
+    for iyM = 1:ny, iy = iyM-1;
+        x(ix+(iy)*nx) = (ix-1)*dx + (-Lx+dx)/2;
+        y(ix+(iy)*nx) = (iy)*dy + (-Ly+dy)/2;
+        P(ix+(iy)*nx) = exp(-(x(ix+(iy)*nx)^2+y(ix+(iy)*nx)^2));
         
-        Pini(ix+(iy-1)*nx)=P(ix+(iy-1)*nx);
+        Pini(ix+(iy)*nx)=P(ix+(iy)*nx);
     end
 end
 % Action
 for it = 1:nt
     for ix = 2:nx
-        for iy = 1:ny
-            Vx(ix+(iy-1)*(nx+1)) = Vx(ix+(iy-1)*(nx+1)) - dt*(P(ix+(iy-1)*nx)-P((ix-1)+(iy-1)*nx))/dx/rho;
+        for iyM = 1:ny, iy = iyM-1;
+            Vx(ix+(iy)*(nx+1)) = Vx(ix+(iy)*(nx+1)) - dt*(P(ix+(iy)*nx)-P((ix-1)+(iy)*nx))/dx/rho;
         end
     end
     for ix = 1:nx
-        for iy = 2:ny
-            Vy(ix+(iy-1)*(nx)) = Vy(ix+(iy-1)*(nx)) - dt*(P(ix+(iy-1)*nx)-P(ix+(iy-2)*nx))/dy/rho;
+        for iyM = 2:ny, iy = iyM-1;
+            Vy(ix+(iy)*(nx)) = Vy(ix+(iy)*(nx)) - dt*(P(ix+(iy)*nx)-P(ix+(iy-1)*nx))/dy/rho;
         end
     end
     for ix = 1:nx
-        for iy = 1:ny
-            P(ix+(iy-1)*nx) = P(ix+(iy-1)*nx) - dt*(Vx((ix+1)+(iy-1)*(nx+1))-Vx(ix+(iy-1)*(nx+1)))/dx*k...
-                - dt*(Vy(ix+(iy)*(nx))-Vy(ix+(iy-1)*(nx)))/dy*k;
+        for iyM = 1:ny, iy = iyM-1;
+            P(ix+(iy)*nx) = P(ix+(iy)*nx) - dt*(Vx((ix+1)+(iy)*(nx+1))-Vx(ix+(iy)*(nx+1)))/dx*k...
+                - dt*(Vy(ix+(iy+1)*(nx))-Vy(ix+(iy)*(nx)))/dy*k;
         end
     end
     % Plot
-    figure(1),clf,scatter(x,y,[20],P),title(it)
-    view(2)
-    axis equal
-    drawnow
+%     figure(1),clf,scatter(x,y,[20],P),title(it)
+%     view(2)
+%     axis equal
+%     drawnow
 end
+toc
+figure(1),clf,scatter(x,y,[50],P,'filled'),title(it)
+view(2)
+colorbar
+axis equal
+save('p_loop_a.mat','P');
