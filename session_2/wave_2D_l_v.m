@@ -3,19 +3,19 @@
 clear % Wave 2D loop
 % Physics
 Lx  = 10;
-Ly  = 4;
+Ly  = 10;
 k   = 1;
 rho = 1;
-mu   = 1;
+mu  = 1;
 % Numerics
-nx  = 100;
-ny  = 100;
+nx  = 127;
+ny  = 127;
 dx  = Lx/nx;
 dy  = Ly/ny;
-T = 3;
-dt  = min([dx,dy])^2/mu/4.1/3/4; 
-nt = round(T/dt);
-plot_step = round(.1/dt);
+%T = 3;
+dt  = min([dx,dy])^2/(mu*4.1*3*4); 
+nt = 200;
+plot_step = 50;
 % Initial arrays
 x    = zeros((nx  )*(ny  ),1);
 y    = zeros((nx  )*(ny  ),1);
@@ -86,9 +86,9 @@ for it = 1:nt
     ttime = round(dt*it,2);
     if(mod(it,plot_step)==0)
         % Plot
-        figure(2)
+        figure(1)
         subplot(2,2,1)
-        scatter(x,y,[20],P),title("Pressure " + ttime)
+        scatter(x,y,[20],P),title("Pressure " + it)
         axis equal
         caxis([-.1 1])
         colorbar
@@ -111,4 +111,4 @@ for it = 1:nt
         drawnow
     end
 end
-save('p_l_v.mat','P');
+save('p_l_v.mat','P','Vx','Vy');

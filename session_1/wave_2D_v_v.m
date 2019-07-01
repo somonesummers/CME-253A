@@ -12,8 +12,8 @@ dx  = Lx/nx;
 dy  = Ly/ny;
 T = 3;
 dt  = min([dx,dy])^2/mu/4.1/3/4; 
-nt = round(T/dt)
-plot_step = round(.1/dt);
+nt = round(T/dt);
+plot_step = round(1/dt);
 % Initial arrays
 x   = (-Lx+dx)/2:dx:(Lx-dx)/2;
 y   = (-Ly+dy)/2:dy:(Ly-dy)/2;
