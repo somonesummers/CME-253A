@@ -8,13 +8,13 @@ k   = 1;
 rho = 1;
 mu  = 1;
 % Numerics
-nx  = 127;
-ny  = 127;
+nx  = 32*4 - 1;
+ny  = 32*4 - 1;
 dx  = Lx/nx;
 dy  = Ly/ny;
 %T = 3;
-dt  = min([dx,dy])^2/(mu*4.1*3*4); 
-nt = 200;
+dt  = 0.0001;%min([dx,dy])*min([dx,dy])/(mu*4.1*3*4); 
+nt = 10;
 plot_step = 50;
 % Initial arrays
 x    = zeros((nx  )*(ny  ),1);
@@ -79,8 +79,8 @@ for it = 1:nt
     for ix = 2:nx
         for iyM = 2:ny, iy = iyM-1;
             Txy(ix+(iy)*(nx+1)) = mu*(...
-                   (Vx(ix+(iy)*(nx+1)) - Vx(ix+(iy-1)*(nx+1)))/dy + ...
-                   (Vy(ix+(iy)*(nx)) - Vy((ix-1)+(iy)*(nx)))/dx);
+                   (Vx(ix+(iy)*(nx+1)) - Vx( ix   +(iy-1)*(nx+1)))/dy + ...
+                   (Vy(ix+(iy)*(nx  )) - Vy((ix-1)+(iy  )*(nx  )))/dx);
         end
     end
     ttime = round(dt*it,2);

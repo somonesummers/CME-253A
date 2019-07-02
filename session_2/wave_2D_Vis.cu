@@ -39,7 +39,7 @@ const DAT mu  = 1.0;
 #define GRID_Y  4
 const int nx = BLOCK_X*GRID_X - OVERLENGTH_X;
 const int ny = BLOCK_Y*GRID_Y - OVERLENGTH_Y;
-const int nt = 200;
+const int nt = 2000;
 const DAT dx = Lx/((DAT)nx);
 const DAT dy = Ly/((DAT)ny);
 const DAT dt = (min(dx,dy)*min(dx,dy))/(mu*4.1*3*4);
@@ -73,36 +73,28 @@ __global__ void compute_V(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy
     int ix = blockIdx.x*blockDim.x + threadIdx.x; // thread ID, dimension x
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
     if (iy<ny && ix>0 && ix<nx){
-        Vx[ix+(iy)*(nx+1)] = Vx[ix+(iy)*(nx+1)] + dt/rho*(
-               (-1)*(P[ix+(iy  )* nx   ] -   P[(ix-1)+(iy)* nx   ])/dx 
-                + (Txx[ix+(iy  )* nx   ] - Txx[(ix-1)+(iy)* nx   ])/dx 
-                + (Txy[ix+(iy+1)*(nx+1)] - Txy[ ix   +(iy)*(nx+1)])/dy);
+        Vx[ix+(iy)*(nx+1)] = Vx[ix+(iy)*(nx+1)] + dt/rho*((-1)*(P[ix+(iy)*nx]-P[(ix-1)+(iy)*nx])/dx + (Txx[ix+(iy)*nx] - Txx[(ix-1)+(iy)*nx])/dx + (Txy[ix+(iy+1)*(nx+1)] - Txy[ix+(iy)*(nx+1)])/dy);
     }
     if (iy>0 && iy<ny && ix<nx){
-        Vy[ix+(iy)*(nx)] = Vy[ix+(iy)*(nx)] + dt/rho*(
-                (-1)*(P[ ix   +(iy)* nx   ] -   P[ix+(iy-1)* nx   ])/dy 
-                 + (Tyy[ ix   +(iy)* nx   ] - Tyy[ix+(iy-1)* nx   ])/dy 
-                 + (Txy[(ix+1)+(iy)*(nx+1)] - Txy[ix+(iy  )*(nx+1)])/dx);
+        Vy[ix+(iy)*(nx)] = Vy[ix+(iy)*(nx)] + dt/rho*((-1)*(P[ix+(iy)*nx]-P[ix+(iy-1)*nx])/dy + (Tyy[ix+(iy)*nx] - Tyy[ix+(iy-1)*nx])/dy + (Txy[(ix+1)+(iy)*(nx+1)] - Txy[ix+(iy)*(nx+1)])/dx);
     }
 }
 __global__ void compute_P(DAT* Vx, DAT* Vy, DAT* P, const DAT dt, const DAT k, const DAT dx, const DAT dy, const int nx, const int ny){
     int ix = blockIdx.x*blockDim.x + threadIdx.x; // thread ID, dimension x
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
     if (iy<ny && ix<nx){
-        P[ix + iy*nx] = P[ix + iy*nx] - dt*k*(
-                (Vx[(ix+1) +  iy   *(nx+1)]-Vx[ix + iy*(nx+1)])/dx 
-              + (Vy[ ix    + (iy+1)* nx   ]-Vy[ix + iy* nx   ])/dy ); 
+        P[ix + iy*nx] = P[ix + iy*nx] - dt*k*((Vx[(ix+1) +  iy   *(nx+1)]-Vx[ix + iy*(nx+1)])/dx + (Vy[ ix    + (iy+1)* nx   ]-Vy[ix + iy* nx   ])/dy ); 
     }
 }
 __global__ void compute_T(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy, const DAT mu, const DAT dt, const DAT dx, const DAT dy, const int nx, const int ny){
     int ix = blockIdx.x*blockDim.x + threadIdx.x; // thread ID, dimension x
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
     if (iy<ny && ix<nx){
-        Txx[ix+iy*nx] = 2*mu*((Vx[(ix+1)+iy*(nx+1)]-Vx[ix+(iy)*(nx+1)])/dx  - 1/3*((Vx[(ix+1) + iy    *(nx+1)]-Vx[ix + iy*(nx+1)])/dx + (Vy[ ix    + (iy+1)* nx   ]-Vy[ix + iy* nx   ])/dy ));
-        Tyy[ix+iy*nx] = 2*mu*((Vx[(ix)+(iy+1)*(nx+1)]-Vx[ix+(iy)*(nx+1)])/dy - 1/3*((Vx[(ix+1) + iy    *(nx+1)]-Vx[ix + iy*(nx+1)])/dx + (Vy[ ix    + (iy+1)* nx   ]-Vy[ix + iy* nx   ])/dy ));
+        Txx[ix+(iy)*nx] = 2*mu*((Vx[(ix+1)+iy*(nx+1)]-Vx[ix+(iy)*(nx+1)])/dx  - 1/3*((Vx[(ix+1) + iy    *(nx+1)]-Vx[ix + iy*(nx+1)])/dx + (Vy[ ix    + (iy+1)* nx   ]-Vy[ix + iy* nx   ])/dy ));
+        Tyy[ix+(iy)*nx] = 2*mu*((Vx[(ix)+(iy+1)*(nx+1)]-Vx[ix+(iy)*(nx+1)])/dy - 1/3*((Vx[(ix+1) + iy    *(nx+1)]-Vx[ix + iy*(nx+1)])/dx + (Vy[ ix    + (iy+1)* nx   ]-Vy[ix + iy* nx   ])/dy ));
     }
     if(iy<ny && ix<nx && ix>0  && iy >0){
-        Txy[ix+iy*(nx+1)] = mu*((Vx[ix+(iy)*(nx+1)] - Vx[ix+(iy-1)*(nx+1)])/dy + (Vy[ix+(iy)*(nx)] - Vy[(ix-1)+(iy)*(nx)])/dx);
+        Txy[ix+(iy)*(nx+1)] = mu*((Vx[ix+(iy)*(nx+1)] - Vx[ix+(iy-1)*(nx+1)])/dy + (Vy[ix+(iy)*(nx)] - Vy[(ix-1)+(iy)*(nx)])/dx);
     }
 }
 int main(){

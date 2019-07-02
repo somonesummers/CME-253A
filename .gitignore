@@ -1,3 +1,4 @@
 *.m~
+*.cu~
 .DS_Store
 *.mat
