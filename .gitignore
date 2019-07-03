@@ -2,3 +2,4 @@
 *.cu~
 .DS_Store
 *.mat
+*.res
