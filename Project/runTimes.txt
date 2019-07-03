@@ -1,0 +1,57 @@
+Process uses GPU with id 0.
+127x127, 0.001 GB, 2000 iterations.
+Launching (4x4) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    0.064 seconds,   14.921 GB/s
+Process uses GPU with id 0.
+255x255, 0.002 GB, 2000 iterations.
+Launching (8x8) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    0.073 seconds,   52.678 GB/s
+Process uses GPU with id 0.
+511x511, 0.010 GB, 2000 iterations.
+Launching (16x16) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    0.162 seconds,   96.100 GB/s
+Process uses GPU with id 0.
+1023x1023, 0.039 GB, 2000 iterations.
+Launching (32x32) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    0.460 seconds,  135.479 GB/s
+Process uses GPU with id 0.
+2047x2047, 0.156 GB, 2000 iterations.
+Launching (64x64) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    1.768 seconds,  141.042 GB/s
+Process uses GPU with id 0.
+4095x4095, 0.625 GB, 2000 iterations.
+Launching (128x128) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    6.281 seconds,  158.894 GB/s
+Process uses GPU with id 0.
+8191x8191, 2.499 GB, 2000 iterations.
+Launching (256x256) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):   25.956 seconds,  153.839 GB/s
+single precision
+Process uses GPU with id 0.
+127x127, 0.000 GB, 2000 iterations.
+Launching (4x4) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    0.077 seconds,    6.253 GB/s
+Process uses GPU with id 0.
+255x255, 0.001 GB, 2000 iterations.
+Launching (8x8) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    0.078 seconds,   24.743 GB/s
+Process uses GPU with id 0.
+511x511, 0.005 GB, 2000 iterations.
+Launching (16x16) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    0.104 seconds,   74.419 GB/s
+Process uses GPU with id 0.
+1023x1023, 0.019 GB, 2000 iterations.
+Launching (32x32) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    0.295 seconds,  105.476 GB/s
+Process uses GPU with id 0.
+2047x2047, 0.078 GB, 2000 iterations.
+Launching (64x64) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    0.973 seconds,  128.188 GB/s
+Process uses GPU with id 0.
+4095x4095, 0.312 GB, 2000 iterations.
+Launching (128x128) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):    4.071 seconds,  122.583 GB/s
+Process uses GPU with id 0.
+8191x8191, 1.250 GB, 2000 iterations.
+Launching (256x256) grid of (32x32) blocks.
+Time (s), Effective MTP (GB/s):   14.520 seconds,  137.502 GB/s
