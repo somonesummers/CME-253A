@@ -3,7 +3,7 @@ clear
 Lx   = 10;
 Ly   = 10;
 % k    = 1e-1;
-rhog = 1;
+rhog = 10;
 eta  = 1;
 % Numerics
 nx   = 100;
@@ -28,7 +28,7 @@ dVydt = zeros(nx  ,ny-1);
 txx   = zeros(nx  ,ny  );
 tyy   = zeros(nx  ,ny  );
 txy   = zeros(nx+1,ny+1);
-Rog   = zeros(nx  ,ny  );
+Rog   = ones(nx  ,ny  );
 rad   = X2.^2 + Y2.^2;
 Rog(rad<1) = rhog;
 % Action
@@ -40,7 +40,8 @@ for it = 1:nt
     tyy           = 2*eta*(diff(Vy,1,2)/dy - 1/3*divV);
     txy(2:end-1,2:end-1) = eta*(diff(Vx(2:end-1,:),1,2)/dy + diff(Vy(:,2:end-1),1,1)/dx);
     Rx            = -diff(Pr,1,1)/dx + diff(txx,1,1)/dx + diff(txy(2:end-1,:),1,2)/dy;
-    Ry            = -diff(Pr,1,2)/dy + diff(tyy,1,2)/dy + diff(txy(:,2:end-1),1,1)/dx + 0.5*(Rog(:,1:end-1)+Rog(:,2:end));
+    %Ry            = -diff(Pr,1,2)/dy + diff(tyy,1,2)/dy + diff(txy(:,2:end-1),1,1)/dx + 0.5*(Rog(:,1:end-1)+Rog(:,2:end));
+    Ry            = -diff(Pr,1,2)/dy + diff(tyy,1,2)/dy + diff(txy(:,2:end-1),1,1)/dx - 0.5*(Rog(:,1:end-1)+Rog(:,2:end));
     dVxdt         = dVxdt*(1-nu/nx) + Rx;
     dVydt         = dVydt*(1-nu/ny) + Ry;
     Vx(2:end-1,:) = Vx(2:end-1,:) + dtV*dVxdt;
@@ -49,9 +50,10 @@ for it = 1:nt
     if mod(it,200)==0
         % Plot
         figure(1),clf
-        subplot(311),semilogy(evol,'-d')
-        subplot(312),imagesc(x,y,Vx'),title(it),axis xy,axis image,colorbar
-        subplot(313),imagesc(x,y,Vy'),title(it),axis xy,axis image,colorbar
+        subplot(221),semilogy(evol,'-d')
+        subplot(222),imagesc(x,y,Pr'),title('Pr'),axis xy,axis image,colorbar
+        subplot(223),imagesc(x,y,Vx'),title('Vx'),axis xy,axis image,colorbar
+        subplot(224),imagesc(x,y,Vy'),title('Vy'),axis xy,axis image,colorbar
         drawnow
     end
 end

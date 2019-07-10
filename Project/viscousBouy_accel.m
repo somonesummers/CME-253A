@@ -35,19 +35,21 @@ Txyc = zeros((nx  )*(ny  ),1);
 Txy  = zeros((nx+1)*(ny+1),1);
 Vx   = zeros((nx+1)*(ny  ),1);
 Vy   = zeros((nx  )*(ny+1),1);
+rad  = zeros((nx  )*(ny+1),1);
+rhog =  ones((nx  )*(ny  ),1);
 % Initial conditions
 for ix = 1:nx+1
     for iyM = 1:ny+1, iy = iyM-1;
         if(iyM <= ny && ix <= nx)
             x(ix+(iy)*nx) = (ix-1)*dx + (-Lx+dx)/2;
             y(ix+(iy)*nx) = (iy)*dy + (-Ly+dy)/2;
-            P(ix+(iy)*nx) = exp(-(x(ix+(iy)*nx)^2+y(ix+(iy)*nx)^2));
-            Pini(ix+(iy)*nx)=P(ix+(iy)*nx);
+            rad(ix+(iy)*nx) = x(ix+(iy)*nx)^2 + y(ix+(iy)*nx)^2;
         end
         xe(ix+(iy)*(nx+1)) = (ix-1)*dx + (-Lx)/2;
         ye(ix+(iy)*(nx+1)) = (iy)*dy + (-Ly)/2;
     end
 end
+rhog(rad < 1) = 10;
 % Action
 for it = 1:nt
     %Velocity Updates
@@ -64,7 +66,8 @@ for it = 1:nt
             Vy(ix+(iy)*(nx)) = Vy(ix+(iy)*(nx)) + dt/rho*(...
                 -1*(P(ix+(iy)*nx)-P(ix+(iy-1)*nx))/dy...                 %dP/dy
                 + (Tyy(ix+(iy)*nx) - Tyy(ix+(iy-1)*nx))/dy...            %dTyy/dy
-                + (Txy((ix+1)+(iy)*(nx+1)) - Txy(ix+(iy)*(nx+1)))/dx); %dTxy/dx
+                + (Txy((ix+1)+(iy)*(nx+1)) - Txy(ix+(iy)*(nx+1)))/dx...  %dTxy/dx
+                - .5*(rhog(ix+(iy)*(nx)) + rhog(ix+(iy+1)*(nx))));       %grav
         end
     end
     %Pressue/Txx/Tyy Updates
@@ -98,7 +101,6 @@ for it = 1:nt
         subplot(131)
         imagesc(x(1:nx),y(1:nx:end),flipud(reshape(P,nx,ny)')),title("Pressure " + it)
         axis equal
-        caxis([-.1 1])
         colorbar
 
         subplot(132)
