@@ -25,9 +25,9 @@ nz  = BLOCK_Z*GRID_Z - OVERLENGTH_Z;
 dx  = Lx/nx;
 dy  = Ly/ny;
 dz  = Lz/nz;
-dtP = 4.1*eta/ny/10;
-dtV = min([dx,dy]).^2/(eta*4.1); 
-nt  = 200;
+dtP = 4.1*eta/ny;
+dtV = min([dx,dy,dz]).^2/(eta*4.1); 
+nt  = 50;
 plot_step = 200;
 nu  = 4;
 epsi= 1e-6;
@@ -188,8 +188,14 @@ end
 %%
 figure(2)
 clf
-%subplot(221)
+subplot(221)
 semilogy(evol);
+
+subplot(222)
+temp = reshape(P,63,63,63);
+imagesc(x(1:nx),z(1:nx*ny:end),squeeze(temp(32,:,:)));
+set(gca,'YDir','normal')
+colorbar
 
 % subplot(222)
 % imagesc(x(1:nx),y(1:nx:end),flipud(reshape(P,nx,ny)')),title("Pressure " + it)
