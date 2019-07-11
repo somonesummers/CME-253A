@@ -1,18 +1,19 @@
-clear 
+%clear 
 % Physics
 Lx   = 10;
 Ly   = 10;
-% k    = 1e-1;
-rhog = 10;
+k    = 1;
+rhoi = 10;
 eta  = 1;
+g = -10;
 % Numerics
-nx   = 100;
-ny   = 101;
+nx   = 127;
+ny   = 127;
 dx   = Lx/nx;
 dy   = Ly/ny;
 nt   = 10000;
 nu   = 6;
-epsi = 1e-6;
+epsi = 1e-8;
 % dtP  = min(dx,dy)/k/2.5;
 dtP  = 4.1*eta/ny/10;
 dtV  = min(dx,dy).^2/eta/4.1;
@@ -28,9 +29,9 @@ dVydt = zeros(nx  ,ny-1);
 txx   = zeros(nx  ,ny  );
 tyy   = zeros(nx  ,ny  );
 txy   = zeros(nx+1,ny+1);
-Rog   = ones(nx  ,ny  );
+Rho   = ones(nx  ,ny  );
 rad   = X2.^2 + Y2.^2;
-Rog(rad<1) = rhog;
+Rho(rad<1) = rhoi;
 % Action
 evol = [];
 for it = 1:nt
@@ -40,8 +41,7 @@ for it = 1:nt
     tyy           = 2*eta*(diff(Vy,1,2)/dy - 1/3*divV);
     txy(2:end-1,2:end-1) = eta*(diff(Vx(2:end-1,:),1,2)/dy + diff(Vy(:,2:end-1),1,1)/dx);
     Rx            = -diff(Pr,1,1)/dx + diff(txx,1,1)/dx + diff(txy(2:end-1,:),1,2)/dy;
-    %Ry            = -diff(Pr,1,2)/dy + diff(tyy,1,2)/dy + diff(txy(:,2:end-1),1,1)/dx + 0.5*(Rog(:,1:end-1)+Rog(:,2:end));
-    Ry            = -diff(Pr,1,2)/dy + diff(tyy,1,2)/dy + diff(txy(:,2:end-1),1,1)/dx - 0.5*(Rog(:,1:end-1)+Rog(:,2:end));
+    Ry            = -diff(Pr,1,2)/dy + diff(tyy,1,2)/dy + diff(txy(:,2:end-1),1,1)/dx + 0.5*g*(Rho(:,1:end-1)+Rho(:,2:end));
     dVxdt         = dVxdt*(1-nu/nx) + Rx;
     dVydt         = dVydt*(1-nu/ny) + Ry;
     Vx(2:end-1,:) = Vx(2:end-1,:) + dtV*dVxdt;
@@ -51,7 +51,7 @@ for it = 1:nt
         % Plot
         figure(1),clf
         subplot(221),semilogy(evol,'-d')
-        subplot(222),imagesc(x,y,Pr'),title('Pr'),axis xy,axis image,colorbar
+        subplot(222),imagesc(x,y,Pr'),title("Pr " + it),axis xy,axis image,colorbar
         subplot(223),imagesc(x,y,Vx'),title('Vx'),axis xy,axis image,colorbar
         subplot(224),imagesc(x,y,Vy'),title('Vy'),axis xy,axis image,colorbar
         drawnow
