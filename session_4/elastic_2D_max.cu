@@ -169,7 +169,9 @@ int main(){
         if (it==3){ tic(); } 
         compute_P<<<grid,block>>>(Vx_d, Vy_d, P_d, txx_d, tyy_d, txy_d, div_d, one_dx, one_dy, dtk, dt2G, dtG, nx, ny);  cudaDeviceSynchronize();
         compute_V<<<grid,block>>>(Vx_d, Vy_d, P_d, txx_d, tyy_d, txy_d, dt_dx_rho, dt_dy_rho,                  nx, ny);  cudaDeviceSynchronize();
-        if (it%nmax==0){ __DEVICE_max(P,nx,ny); printf("max(P)=%1.3e \n", P_MAX); }
+        __DEVICE_max(P,nx,ny);
+        if (it%nmax==0){ printf("max(P)=%1.3e \n", P_MAX); }
+        if (P_MAX < 5.0E-1){break;}
     }//it
     tim("Time (s), Effective MTP (GB/s)", mem*(nt-3)*6*2/1024./1024./1024.);
     save_info();
