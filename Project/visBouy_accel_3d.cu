@@ -94,6 +94,7 @@ __global__ void init(DAT* x, DAT* y, DAT* z, DAT* rho, const DAT Lx, const DAT L
 __global__ void compute_V(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy, const DAT dt, const DAT rho, const DAT dx, const DAT dy, const int nx, const int ny){
     int ix = blockIdx.x*blockDim.x + threadIdx.x; // thread ID, dimension x
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
+    int iz = blockIdx.z*blockDim.z + threadIdx.z; // thread ID, dimension z
     if (iy<ny && ix>0 && ix<nx){
         Vx[ix+(iy)*(nx+1)] = Vx[ix+(iy)*(nx+1)] + dt/rho*(
                 -1*(P[ix+(iy)*nx]-P[(ix-1)+(iy)*nx])/dx
@@ -107,17 +108,21 @@ __global__ void compute_V(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy
                 + (Txy[(ix+1)+(iy)*(nx+1)] - Txy[ix+(iy)*(nx+1)])/dx);
     }
 }
-__global__ void compute_P(DAT* Vx, DAT* Vy, DAT* P, const DAT dt, const DAT k, const DAT dx, const DAT dy, const int nx, const int ny){
+__global__ void compute_P(DAT* Vx, DAT* Vy, DAT* Vz, DAT* P, const DAT dt, const DAT k, const DAT dx, const DAT dy, const DAT dz, const int nx, const int ny, const int nz){
     int ix = blockIdx.x*blockDim.x + threadIdx.x; // thread ID, dimension x
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
-    if (iy<ny && ix<nx){
-        P[ix + iy*nx] =  P[ix+(iy)*nx] - dt*k*((Vx[(ix+1)+(iy)*(nx+1)]-Vx[ix+(iy)*(nx+1)])/dx+
-                  (Vy[ix+(iy+1)*(nx)]-Vy[ix+(iy)*(nx)])/dy); 
+    int iz = blockIdx.z*blockDim.z + threadIdx.z; // thread ID, dimension z
+    if (iy<ny && ix<nx && iz<nz){
+        P[ix+(iy)*nx+(iz)*nx*ny] = P[ix+(iy)*nx+(iz)*nx*ny] - dtP*k*(...
+                  (Vx[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )]-Vx[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dx+...
+                  (Vy[(ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1)]-Vy[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dy+...
+                  (Vz[(ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  )]-Vz[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )])/dz);
     }
 }
 __global__ void compute_T(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy, const DAT mu, const DAT dt, const DAT dx, const DAT dy, const int nx, const int ny){
     int ix = blockIdx.x*blockDim.x + threadIdx.x; // thread ID, dimension x
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
+    int iz = blockIdx.z*blockDim.z + threadIdx.z; // thread ID, dimension z
     if (iy<ny && ix<nx){
         Txx[ix+(iy)*nx] = 2*mu*(
                          (Vx[(ix+1)+(iy  )*(nx+1)]-Vx[ix+(iy)*(nx+1)])/dx - 
