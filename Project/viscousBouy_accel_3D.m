@@ -13,23 +13,22 @@ g    = -10;
 OVERLENGTH_X = 1;
 OVERLENGTH_Y = 1;
 OVERLENGTH_Z = 1;
-BLOCK_X = 16;
-BLOCK_Y = 16;
-BLOCK_Z = 16;
+BLOCK_X = 8;
+BLOCK_Y = 8;
+BLOCK_Z = 8;
 GRID_X  = 4;
 GRID_Y  = 4;
 GRID_Z  = 4;
 nx  = BLOCK_X*GRID_X - OVERLENGTH_X;
 ny  = BLOCK_Y*GRID_Y - OVERLENGTH_Y;
 nz  = BLOCK_Z*GRID_Z - OVERLENGTH_Z;
+nt  = 40000;
 dx  = Lx/nx;
 dy  = Ly/ny;
 dz  = Lz/nz;
-dtP = 4.1*eta/ny;
-dtV = min([dx,dy,dz]).^2/(eta*4.1); 
-nt  = 50;
-plot_step = 200;
-nu  = 4;
+dtP = 4.1*eta/ny/4;
+dtV = min([dx,dy,dz]).^2/(eta*4.1)/4; 
+nu  = 6;
 epsi= 1e-6;
 % Initial arrays
 evol = [];
@@ -56,7 +55,7 @@ Rx   = zeros((nx+1)*(ny  )*(nz  ),1);
 Ry   = zeros((nx  )*(ny+1)*(nz  ),1);
 Rz   = zeros((nx  )*(ny  )*(nz+1),1);
 rad  = zeros((nx  )*(ny  )*(nz  ),1);
-rho  =  ones((nx  )*(ny  )*(nz  ),1);
+rho  = zeros((nx  )*(ny  )*(nz  ),1);
 % Initial conditions
 for ix = 1:nx+1
     for iyM = 1:ny+1, iy = iyM-1;
@@ -81,24 +80,24 @@ for it = 1:nt
         for iyM = 1:ny, iy = iyM-1;
             for izM = 1:nz, iz = izM-1;
             P(ix+(iy)*nx+(iz)*nx*ny) = P(ix+(iy)*nx+(iz)*nx*ny) - dtP*k*(...
-                  (Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  ))-Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx+...
-                  (Vy((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1))-Vy((ix+1)+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy+...
-                  (Vz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  ))-Vz((ix+1)+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )))/dz);
+                  (Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  ))-Vx((ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx+...
+                  (Vy((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1))-Vy((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy+...
+                  (Vz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  ))-Vz((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )))/dz);
             Txx(ix+(iy)*nx+(iz)*nx*ny) = 2*eta*(...
-                  (Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  ))-Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx - ...
-                 ((Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  ))-Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx+...
-                  (Vy((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1))-Vy((ix+1)+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy+...
-                  (Vz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  ))-Vz((ix+1)+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )))/dz)/3);
+                  (Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  ))-Vx((ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx - ...
+                 ((Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  ))-Vx((ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx+...
+                  (Vy((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1))-Vy((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy+...
+                  (Vz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  ))-Vz((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )))/dz)/3);
             Tyy(ix+(iy)*nx+(iz)*nx*ny) = 2*eta*(...
-                  (Vy((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1))-Vy((ix+1)+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy - ...
-                 ((Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  ))-Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx+...
-                  (Vy((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1))-Vy((ix+1)+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy+...
-                  (Vz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  ))-Vz((ix+1)+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )))/dz)/3);
+                  (Vy((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1))-Vy((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy - ...
+                 ((Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  ))-Vx((ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx+...
+                  (Vy((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1))-Vy((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy+...
+                  (Vz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  ))-Vz((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )))/dz)/3);
             Tzz(ix+(iy)*nx+(iz)*nx*ny) = 2*eta*(...
-                  (Vz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  ))-Vz((ix+1)+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )))/dz - ...
-                 ((Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  ))-Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx+...
-                  (Vy((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1))-Vy((ix+1)+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy+...
-                  (Vz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  ))-Vz((ix+1)+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )))/dz)/3);
+                  (Vz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  ))-Vz((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )))/dz - ...
+                 ((Vx((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  ))-Vx((ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx+...
+                  (Vy((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1))-Vy((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy+...
+                  (Vz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  ))-Vz((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )))/dz)/3);
             end
         end
     end
@@ -144,7 +143,7 @@ for it = 1:nt
                        + (Txy((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny+1)) - Txy((ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny+1)))/dx...
                        + (Tyz((ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny+1)) - Tyz((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dz...
                   + .5*g*(rho((ix  )+(iy  )* nx   +(iz  )* nx   * ny   ) + rho((ix  )+(iy-1)* nx   +(iz  )* nx   * ny   )));
-                    dVydt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) = (1-nu/nx)*dVydt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) + Ry(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1));
+                    dVydt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) = (1-nu/ny)*dVydt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) + Ry(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1));
                     Vy(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) = Vy(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) + dtV*dVydt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1));
                  end
                  if izM > 2
@@ -152,8 +151,8 @@ for it = 1:nt
                         -1*(P((ix  )+(iy  )* nx   +(iz  )* nx   * ny   ) -   P((ix  )+(iy  )* nx   +(iz-1)* nx   * ny   ))/dz...             
                        + (Tzz((ix  )+(iy  )* nx   +(iz  )* nx   * ny   ) - Tzz((ix  )+(iy  )* nx   +(iz-1)* nx   * ny   ))/dz...        
                        + (Txz((ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )) - Txz((ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )))/dx...
-                       + (Tyz((ix  )+(iy+1)*(nx  )+(iz+1)*(nx  )*(ny+1)) - Tyz((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy);
-                    dVzdt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )) = (1-nu/nx)*dVzdt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )) + Rz(ix+(iy)*(nx  )+(iz)*(nx  )*(ny  ));
+                       + (Tyz((ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1)) - Tyz((ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)))/dy);
+                    dVzdt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )) = (1-nu/nz)*dVzdt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )) + Rz(ix+(iy)*(nx  )+(iz)*(nx  )*(ny  ));
                     Vz(ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )) = Vz(ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )) + dtV*dVzdt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny  ));
                  end
              end
@@ -161,55 +160,49 @@ for it = 1:nt
     end
     err = max([max(abs(Rx(:))), max(abs(Ry(:))),max(abs(Rz(:)))]);
     evol = [evol, err]; 
-    %if err<epsi, break; end
-%     if(mod(it,plot_step)==0)
-%         %Plot
-%         figure(2)
-%         subplot(221)
-%         semilogy(evol);
-%         
-%         subplot(222)
-%         imagesc(x(1:nx),y(1:nx:end),flipud(reshape(P,nx,ny)')),title("Pressure " + it)
-%         axis equal
-%         colorbar
-% 
-%         subplot(223)
-%         imagesc(xe(1:nx+1),y(1:nx:end),flipud(reshape(Vx,nx+1,ny)')),title("Vx")
-%         axis equal
-%         colorbar
-% 
-%         subplot(224)
-%         imagesc(x(1:nx),ye(1:(nx+1):end),flipud(reshape(Vy,nx,ny+1)')),title("Vy")
-%         axis equal
-%         colorbar
-%         drawnow
-%     end
+    if err<epsi, break; end
+    if(mod(it,50)==0)
+        %% Plot
+        figure(2)
+        clf
+        subplot(221)
+        semilogy(evol);
+
+        subplot(222)
+        temp1 = reshape(P,nx,ny,nz);
+        imagesc(x(1:nx),y(1:nx:nx*ny),squeeze(temp1(:,:,(nz+1)/2))'),title("Pr")
+        xlabel('x')
+        ylabel('y')
+        set(gca,'YDir','normal')
+        colorbar
+        
+        subplot(223)
+        temp2 = reshape(Vy,nx,ny+1,nz);
+        imagesc(x(1:nx),ye(1:nx+1:(nx+1)*(ny+1)),squeeze(temp2(:,:,(nz+1)/2))'),title("Vy")
+        set(gca,'YDir','normal')
+        xlabel('x')
+        ylabel('y')
+        axis equal
+        colorbar
+
+        subplot(224)
+        temp3 = reshape(Vx,nx+1,ny,nz);
+        imagesc(x(1:nx),ye(1:nx:(nx+1)*(ny+1)),squeeze(temp3(:,:,(nz+1)/2))'),title("Vx")
+        set(gca,'YDir','normal')
+        axis equal
+        colorbar
+        drawnow
+     end
 end
+it
+%% 
+figure(3)
+Vyp = reshape(Vy,nx,ny+1,nz);
+Vxp = reshape(Vx,nx+1,ny,nz);
+Vxp = squeeze(Vxp(:,:,(nz+1)/2));
+Vyp = squeeze(Vyp(:,:,(nz+1)/2));
+Vxp = .5*(Vxp(1:end-1,:) + Vxp(2:end,:));
+Vyp = .5*(Vyp(:,1:end-1) + Vyp(:,2:end));
+quiver(Vxp,Vyp)
 %%
-figure(2)
-clf
-subplot(221)
-semilogy(evol);
-
-subplot(222)
-temp = reshape(P,63,63,63);
-imagesc(x(1:nx),z(1:nx*ny:end),squeeze(temp(32,:,:)));
-set(gca,'YDir','normal')
-colorbar
-
-% subplot(222)
-% imagesc(x(1:nx),y(1:nx:end),flipud(reshape(P,nx,ny)')),title("Pressure " + it)
-% axis equal
-% colorbar
-% 
-% subplot(223)
-% imagesc(xe(1:nx+1),y(1:nx:end),flipud(reshape(Vx,nx+1,ny)')),title("Vx")
-% axis equal
-% colorbar
-% 
-% subplot(224)
-% imagesc(x(1:nx),ye(1:(nx+1):end),flipud(reshape(Vy,nx,ny+1)')),title("Vy")
-% axis equal
-% colorbar
-
 save('p_l_v.mat','P','Vx','Vy','Txx','Tyy','Txy','Txz','Tyz');

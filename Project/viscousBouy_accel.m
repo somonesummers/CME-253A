@@ -11,8 +11,8 @@ g    = -10;
 % Numerics
 OVERLENGTH_X = 1;
 OVERLENGTH_Y = 1;
-BLOCK_X = 32;
-BLOCK_Y = 32;
+BLOCK_X = 16;
+BLOCK_Y = 16;
 GRID_X  = 4;
 GRID_Y  = 4;
 nx  = BLOCK_X*GRID_X - OVERLENGTH_X;
@@ -22,7 +22,7 @@ dy  = Ly/ny;
 dtP = 4.1*eta/ny/10;
 dtV = min([dx,dy]).^2/(eta*4.1); 
 nt  = 10000;
-plot_step = 200;
+plot_step = 10;
 nu  = 6;
 epsi= 1e-8;
 % Initial arrays
@@ -133,7 +133,7 @@ for it = 1:nt
 %     end
 end
 %%
-figure(2)
+figure(1)
 subplot(221)
 semilogy(evol);
 
