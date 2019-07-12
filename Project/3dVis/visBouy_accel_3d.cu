@@ -1,5 +1,5 @@
 // 3D Bouyant Ball viscous code
-// nvcc -arch=sm_70 -O3 wave_2D_Vis_v2.cu
+// nvcc -arch=sm_70 -O3 visBouy_accel_3d.cu
 // run: ./a.out
 #include "stdio.h"
 #include "stdlib.h"
@@ -33,29 +33,30 @@ const DAT Ly  = 10.0;
 const DAT Lz  = 10.0;
 const DAT k   = 1.0;
 const DAT rhoi= 10.0;
+const DAT g   = -10.0;
 const DAT eta = 1.0;
 const DAT nu  = 6.0;
-const DAT epsi= 1.0e-6;
+//const DAT epsi= 1.0e-6;
 // Numerics
 #define BLOCK_X 8
 #define BLOCK_Y 8
 #define BLOCK_Z 8
 #define GRID_X  4
 #define GRID_Y  4 
-#define GRID_z  4 
+#define GRID_Z  4 
 const int nx = BLOCK_X*GRID_X - OVERLENGTH_X;
 const int ny = BLOCK_Y*GRID_Y - OVERLENGTH_Y;
 const int nz = BLOCK_Z*GRID_Z - OVERLENGTH_Z;
-const int nt = 40000;
+const int nt = 1000;
 const DAT dx = Lx/((DAT)nx);
 const DAT dy = Ly/((DAT)ny);
 const DAT dz = Lz/((DAT)nz);
-const DAT dtV = (min(dx,dy,dz)*min(dx,dy,dz))/(eta*4.1*((DAT)4));
+const DAT dtV = (min(dx, min(dy,dz))*min(dx,min(dy,dz)))/(eta*4.1*((DAT)4));
 const DAT dtP = 4.1*eta/((DAT)(4*ny));
 // --------------------------------------------------------------------- //
 void save_info(int me, const int nx, const int ny, const int nz){
     FILE* fid;
-    if (me==0){ fid=fopen("0_nxy.inf" ,"w"); fprintf(fid,"%d %d %d %d", PRECIS, nx, ny, nz); fclose(fid); }
+    if (me==0){ fid=fopen("0_nxyz.inf" ,"w"); fprintf(fid,"%d %d %d %d", PRECIS, nx, ny, nz); fclose(fid); }
 }
 #define save_info() save_info(me, nx, ny, nz);
 
@@ -92,7 +93,7 @@ __global__ void init(DAT* x, DAT* y, DAT* z, DAT* rho, const DAT Lx, const DAT L
     }
 }
 __global__ void compute_V(DAT* Vx, DAT* Vy, DAT* Vz, DAT* P, DAT* Txx, DAT* Tyy, DAT* Tzz, DAT* Txy, DAT* Txz, DAT* Tyz, DAT* dVxdt, DAT* dVydt, DAT* dVzdt, 
-                            DAT* Rx, DAT* Ry, DAT* Rz, const DAT dtV, const DAT dx, const DAT dy, const DAT dz, const int nx, const int ny,  const int nz){
+                            DAT* Rx, DAT* Ry, DAT* Rz, DAT* rho, const DAT dtV, const DAT g, const DAT dx, const DAT dy, const DAT dz, const int nx, const int ny,  const int nz){
     int ix = blockIdx.x*blockDim.x + threadIdx.x; // thread ID, dimension x
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
     int iz = blockIdx.z*blockDim.z + threadIdx.z; // thread ID, dimension z
@@ -103,7 +104,7 @@ __global__ void compute_V(DAT* Vx, DAT* Vy, DAT* Vz, DAT* P, DAT* Txx, DAT* Tyy,
            + (Txy[(ix)+(iy+1)*(nx+1)+(iz  )*(nx+1)*(ny+1)] - Txy[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny+1)])/dy
            + (Txz[(ix)+(iy  )*(nx+1)+(iz+1)*(nx+1)*(ny  )] - Txz[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dz);
             dVxdt[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] = (1-nu/nx)*dVxdt[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] + Rx[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny];
-            Vx[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] = Vx(ix+(iy)*(nx+1)+(iz)*(nx+1)*ny) + dtV*dVxdt[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny];
+            Vx[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] = Vx[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] + dtV*dVxdt[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny];
     }
     if (iy>0 && iy<ny && ix<nx && iz<nz){
          Ry[ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)] = 1 * (
@@ -215,9 +216,9 @@ int main(){
     for (it=0;it<nt;it++){
         if (it==1){ tic(); } 
         compute_P<<<grid,block>>>(Vx_d, Vy_d, Vz_d, P_d, dtP, k, dx, dy, dz, nx, ny, nz);  cudaDeviceSynchronize();
-        compute_T<<<grid,block>>>(Vx_d, Vy_d, Vz_d, Txx_d, Tyy_d, Tzz,_d, Txy_d, Txz_d, Tyz_d, eta, dx, dy, dz, nx, ny, nz);  cudaDeviceSynchronize();
-        compute_V<<<grid,block>>>(Vx_d, Vy_d, Vz_d, P_d, Txx_d, Tyy_d, Tzz_d, Txy_d, Txz_d, Tyz_d, dVxdt_d, dVydt_d, dVzdt, 
-                          _d  Rx_d, Ry_d, Rz_d,dtV ,dx ,dy ,dz ,nx ,ny ,nz );  cudaDeviceSynchronize();
+        compute_T<<<grid,block>>>(Vx_d, Vy_d, Vz_d, Txx_d, Tyy_d, Tzz_d, Txy_d, Txz_d, Tyz_d, eta, dx, dy, dz, nx, ny, nz);  cudaDeviceSynchronize();
+        compute_V<<<grid,block>>>(Vx_d, Vy_d, Vz_d, P_d, Txx_d, Tyy_d, Tzz_d, Txy_d, Txz_d, Tyz_d, dVxdt_d, dVydt_d, dVzdt_d,
+                                  Rx_d, Ry_d, Rz_d, rho_d, dtV, g, dx ,dy ,dz ,nx ,ny ,nz );  cudaDeviceSynchronize();
     }//it
     tim("Time (s), Effective MTP (GB/s)", mem*(nt-3)*4/1024./1024./1024.);
     save_info();
