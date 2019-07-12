@@ -91,14 +91,15 @@ __global__ void init(DAT* x, DAT* y, DAT* z, DAT* rho, const DAT Lx, const DAT L
         }
     }
 }
-__global__ void compute_V(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy, const DAT dt, const DAT rho, const DAT dx, const DAT dy, const int nx, const int ny){
+__global__ void compute_V(DAT* Vx, DAT* Vy, DAT* Vz, DAT* P, DAT* Txx, DAT* Tyy, DAT* Tzz, DAT* Txy, DAT* Txz, DAT* Tyz, DAT* dVxdt, DAT* dVydt, DAT* dVzdt, 
+                            DAT* Rx, DAT* Ry, DAT* Rz, const DAT dtV, const DAT dx, const DAT dy, const DAT dz, const int nx, const int ny,  const int nz){
     int ix = blockIdx.x*blockDim.x + threadIdx.x; // thread ID, dimension x
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
     int iz = blockIdx.z*blockDim.z + threadIdx.z; // thread ID, dimension z
     if (ix>0 && iy<ny && ix<nx && iz<nz){
         Rx[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] = 1 * (
-            -1*(P[ ix +(iy  )* nx   +(iz  )* nx   * ny   ] -   P[(ix-1)+(iy  )* nx   +(iz  )* nx   * ny   ])/dx             
-           + (Txx[ ix +(iy  )* nx   +(iz  )* nx   * ny   ] - Txx[(ix-1)+(iy  )* nx   +(iz  )* nx   * ny   ])/dx        
+            -1*(P[ ix +(iy  )* nx   +(iz  )* nx   * ny   ] -   P[(ix-1)+(iy  )* nx   +(iz  )* nx   * ny   ])/dx
+           + (Txx[ ix +(iy  )* nx   +(iz  )* nx   * ny   ] - Txx[(ix-1)+(iy  )* nx   +(iz  )* nx   * ny   ])/dx
            + (Txy[(ix)+(iy+1)*(nx+1)+(iz  )*(nx+1)*(ny+1)] - Txy[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny+1)])/dy
            + (Txz[(ix)+(iy  )*(nx+1)+(iz+1)*(nx+1)*(ny  )] - Txz[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dz);
             dVxdt[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] = (1-nu/nx)*dVxdt[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] + Rx[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny];
@@ -106,8 +107,8 @@ __global__ void compute_V(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy
     }
     if (iy>0 && iy<ny && ix<nx && iz<nz){
          Ry[ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)] = 1 * (
-                -1*(P[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] -   P[(ix  )+(iy-1)* nx   +(iz  )* nx   * ny   ])/dy             
-               + (Tyy[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] - Tyy[(ix  )+(iy-1)* nx   +(iz  )* nx   * ny   ])/dy        
+                -1*(P[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] -   P[(ix  )+(iy-1)* nx   +(iz  )* nx   * ny   ])/dy
+               + (Tyy[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] - Tyy[(ix  )+(iy-1)* nx   +(iz  )* nx   * ny   ])/dy
                + (Txy[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny+1)] - Txy[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny+1)])/dx
                + (Tyz[(ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny+1)] - Tyz[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dz
           + .5*g*(rho[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] + rho[(ix  )+(iy-1)* nx   +(iz  )* nx   * ny   ]));
@@ -116,15 +117,15 @@ __global__ void compute_V(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy
     }
     if (iz>0 && iy<ny && ix<nx && iz<nz){
         Rz[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )] = 1 * (
-            -1*(P[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] -   P[(ix  )+(iy  )* nx   +(iz-1)* nx   * ny   ])/dz             
-           + (Tzz[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] - Tzz[(ix  )+(iy  )* nx   +(iz-1)* nx   * ny   ])/dz        
+            -1*(P[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] -   P[(ix  )+(iy  )* nx   +(iz-1)* nx   * ny   ])/dz
+           + (Tzz[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] - Tzz[(ix  )+(iy  )* nx   +(iz-1)* nx   * ny   ])/dz
            + (Txz[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )] - Txz[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dx
            + (Tyz[(ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1)] - Tyz[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dy);
             dVzdt[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )] = (1-nu/nz)*dVzdt[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )] + Rz[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )];
             Vz[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )] = Vz[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )] + dtV*dVzdt[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )];
     }
 }
-__global__ void compute_P(DAT* Vx, DAT* Vy, DAT* Vz, DAT* P, const DAT dt, const DAT k, const DAT dx, const DAT dy, const DAT dz, const int nx, const int ny, const int nz){
+__global__ void compute_P(DAT* Vx, DAT* Vy, DAT* Vz, DAT* P, const DAT dtP, const DAT k, const DAT dx, const DAT dy, const DAT dz, const int nx, const int ny, const int nz){
     int ix = blockIdx.x*blockDim.x + threadIdx.x; // thread ID, dimension x
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
     int iz = blockIdx.z*blockDim.z + threadIdx.z; // thread ID, dimension z
@@ -185,7 +186,7 @@ int main(){
     gpu_id = GPU_ID; cudaSetDevice(gpu_id); cudaGetDevice(&gpu_id);
     cudaDeviceReset(); cudaDeviceSetCacheConfig(cudaFuncCachePreferL1);  // set L1 to prefered
     printf("Process uses GPU with id %d.\n",gpu_id);
-    printf("%dx%d, %1.3f GB, %d iterations.\n", nx,ny, 5*mem/1024./1024./1024., nt);
+    printf("%dx%dx%d, %1.3f GB, %d iterations.\n", nx,ny,nz, 5*mem/1024./1024./1024., nt);
     printf("Launching (%dx%dx%d) grid of (%dx%dx%d) blocks.\n", grid.x, grid.y, grid.z, block.x, block.y, block.z);
     // Initial arrays
     zeros(x    ,nx  ,ny  ,nz  );
@@ -213,9 +214,10 @@ int main(){
     // Action
     for (it=0;it<nt;it++){
         if (it==1){ tic(); } 
-        compute_V<<<grid,block>>>(Vx_d, Vy_d, P_d, Txx_d, Tyy_d, Txy_d, dt, rho, dx, dy, nx, ny);  cudaDeviceSynchronize();
-        compute_P<<<grid,block>>>(Vx_d, Vy_d, P_d, dt, k, dx, dy, nx, ny);  cudaDeviceSynchronize();
-        compute_T<<<grid,block>>>(Vx_d, Vy_d, P_d, Txx_d, Tyy_d, Txy_d, eta, dt, dx, dy, nx, ny);  cudaDeviceSynchronize();
+        compute_P<<<grid,block>>>(Vx_d, Vy_d, Vz_d, P_d, dtP, k, dx, dy, dz, nx, ny, nz);  cudaDeviceSynchronize();
+        compute_T<<<grid,block>>>(Vx_d, Vy_d, Vz_d, Txx_d, Tyy_d, Tzz,_d, Txy_d, Txz_d, Tyz_d, eta, dx, dy, dz, nx, ny, nz);  cudaDeviceSynchronize();
+        compute_V<<<grid,block>>>(Vx_d, Vy_d, Vz_d, P_d, Txx_d, Tyy_d, Tzz_d, Txy_d, Txz_d, Tyz_d, dVxdt_d, dVydt_d, dVzdt, 
+                          _d  Rx_d, Ry_d, Rz_d,dtV ,dx ,dy ,dz ,nx ,ny ,nz );  cudaDeviceSynchronize();
     }//it
     tim("Time (s), Effective MTP (GB/s)", mem*(nt-3)*4/1024./1024./1024.);
     save_info();
