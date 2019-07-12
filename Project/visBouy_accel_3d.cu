@@ -113,28 +113,35 @@ __global__ void compute_P(DAT* Vx, DAT* Vy, DAT* Vz, DAT* P, const DAT dt, const
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
     int iz = blockIdx.z*blockDim.z + threadIdx.z; // thread ID, dimension z
     if (iy<ny && ix<nx && iz<nz){
-        P[ix+(iy)*nx+(iz)*nx*ny] = P[ix+(iy)*nx+(iz)*nx*ny] - dtP*k*(...
-                  (Vx[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )]-Vx[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dx+...
-                  (Vy[(ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1)]-Vy[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dy+...
+        P[ix+(iy)*nx+(iz)*nx*ny] = P[ix+(iy)*nx+(iz)*nx*ny] - dtP*k*(
+                  (Vx[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )]-Vx[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dx+
+                  (Vy[(ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1)]-Vy[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dy+
                   (Vz[(ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  )]-Vz[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )])/dz);
     }
 }
-__global__ void compute_T(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy, const DAT mu, const DAT dt, const DAT dx, const DAT dy, const int nx, const int ny){
+__global__ void compute_T(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy, const DAT eta, const DAT dt, const DAT dx, const DAT dy, const int nx, const int ny){
     int ix = blockIdx.x*blockDim.x + threadIdx.x; // thread ID, dimension x
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
     int iz = blockIdx.z*blockDim.z + threadIdx.z; // thread ID, dimension z
-    if (iy<ny && ix<nx){
-        Txx[ix+(iy)*nx] = 2*mu*(
-                         (Vx[(ix+1)+(iy  )*(nx+1)]-Vx[ix+(iy)*(nx+1)])/dx - 
-                        ((Vx[(ix+1)+(iy  )*(nx+1)]-Vx[ix+(iy)*(nx+1)])/dx +
-                         (Vy[ ix   +(iy+1)*(nx  )]-Vy[ix+(iy)*(nx  )])/dy)/((DAT)3));
-        Tyy[ix+(iy)*nx] = 2*mu*(
-                         (Vy[ ix   +(iy+1)*(nx  )]-Vy[ix+(iy)*(nx  )])/dy - 
-                        ((Vx[(ix+1)+(iy  )*(nx+1)]-Vx[ix+(iy)*(nx+1)])/dx +
-                         (Vy[ ix   +(iy+1)*(nx  )]-Vy[ix+(iy)*(nx  )])/dy)/((DAT)3));
+    if (iy<ny && ix<nx && iz<nz){
+        Txx[ix+(iy)*nx+(iz)*nx*ny] = 2*eta*(...
+                  (Vx[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )]-Vx[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dx - ...
+                 ((Vx[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )]-Vx[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dx+...
+                  (Vy[(ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1)]-Vy[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dy+...
+                  (Vz[(ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  )]-Vz[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )])/dz)/((DAT)3));
+            Tyy[ix+(iy)*nx+(iz)*nx*ny] = 2*eta*(...
+                  (Vy[(ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1)]-Vy[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dy - ...
+                 ((Vx[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )]-Vx[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dx+...
+                  (Vy[(ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1)]-Vy[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dy+...
+                  (Vz[(ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  )]-Vz[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )])/dz)/((DAT)3));
+            Tzz[ix+(iy)*nx+(iz)*nx*ny] = 2*eta*(...
+                  (Vz[(ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  )]-Vz[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )])/dz - ...
+                 ((Vx[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )]-Vx[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dx+...
+                  (Vy[(ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1)]-Vy[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dy+...
+                  (Vz[(ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny  )]-Vz[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny  )])/dz)/((DAT)3));
     }
     if(iy<ny && ix<nx && ix>0  && iy >0){
-        Txy[ix+(iy)*(nx+1)] = mu*(
+        Txy[ix+(iy)*(nx+1)] = eta*(
                    (Vx[ix+(iy)*(nx+1)] - Vx[ ix   +(iy-1)*(nx+1)])/dy + 
                    (Vy[ix+(iy)*(nx  )] - Vy[(ix-1)+(iy  )*(nx  )])/dx);
     }
@@ -182,7 +189,7 @@ int main(){
         if (it==1){ tic(); } 
         compute_V<<<grid,block>>>(Vx_d, Vy_d, P_d, Txx_d, Tyy_d, Txy_d, dt, rho, dx, dy, nx, ny);  cudaDeviceSynchronize();
         compute_P<<<grid,block>>>(Vx_d, Vy_d, P_d, dt, k, dx, dy, nx, ny);  cudaDeviceSynchronize();
-        compute_T<<<grid,block>>>(Vx_d, Vy_d, P_d, Txx_d, Tyy_d, Txy_d, mu, dt, dx, dy, nx, ny);  cudaDeviceSynchronize();
+        compute_T<<<grid,block>>>(Vx_d, Vy_d, P_d, Txx_d, Tyy_d, Txy_d, eta, dt, dx, dy, nx, ny);  cudaDeviceSynchronize();
     }//it
     tim("Time (s), Effective MTP (GB/s)", mem*(nt-3)*4/1024./1024./1024.);
     save_info();
