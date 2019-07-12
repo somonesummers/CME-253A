@@ -96,13 +96,32 @@ __global__ void compute_V(DAT* Vx, DAT* Vy, DAT* P, DAT* Txx, DAT* Tyy, DAT* Txy
     int iy = blockIdx.y*blockDim.y + threadIdx.y; // thread ID, dimension y
     int iz = blockIdx.z*blockDim.z + threadIdx.z; // thread ID, dimension z
     if (ix>0 && iy<ny && ix<nx && iz<nz){
-       
+        Rx[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] = 1 * (
+            -1*(P[ ix +(iy  )* nx   +(iz  )* nx   * ny   ] -   P[(ix-1)+(iy  )* nx   +(iz  )* nx   * ny   ])/dx             
+           + (Txx[ ix +(iy  )* nx   +(iz  )* nx   * ny   ] - Txx[(ix-1)+(iy  )* nx   +(iz  )* nx   * ny   ])/dx        
+           + (Txy[(ix)+(iy+1)*(nx+1)+(iz  )*(nx+1)*(ny+1)] - Txy[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny+1)])/dy
+           + (Txz[(ix)+(iy  )*(nx+1)+(iz+1)*(nx+1)*(ny  )] - Txz[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dz);
+            dVxdt[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] = (1-nu/nx)*dVxdt[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] + Rx[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny];
+            Vx[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny] = Vx(ix+(iy)*(nx+1)+(iz)*(nx+1)*ny) + dtV*dVxdt[ix+(iy)*(nx+1)+(iz)*(nx+1)*ny];
     }
     if (iy>0 && iy<ny && ix<nx && iz<nz){
-        
+         Ry[ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)] = 1 * (
+                -1*(P[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] -   P[(ix  )+(iy-1)* nx   +(iz  )* nx   * ny   ])/dy             
+               + (Tyy[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] - Tyy[(ix  )+(iy-1)* nx   +(iz  )* nx   * ny   ])/dy        
+               + (Txy[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny+1)] - Txy[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny+1)])/dx
+               + (Tyz[(ix  )+(iy  )*(nx  )+(iz+1)*(nx  )*(ny+1)] - Tyz[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dz
+          + .5*g*(rho[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] + rho[(ix  )+(iy-1)* nx   +(iz  )* nx   * ny   ]));
+                dVydt[ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)] = (1-nu/ny)*dVydt[ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)] + Ry[ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)];
+                Vy[ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)] = Vy[ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)] + dtV*dVydt[ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)];
     }
     if (iz>0 && iy<ny && ix<nx && iz<nz){
-        
+        Rz[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )] = 1 * (
+            -1*(P[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] -   P[(ix  )+(iy  )* nx   +(iz-1)* nx   * ny   ])/dz             
+           + (Tzz[(ix  )+(iy  )* nx   +(iz  )* nx   * ny   ] - Tzz[(ix  )+(iy  )* nx   +(iz-1)* nx   * ny   ])/dz        
+           + (Txz[(ix+1)+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )] - Txz[(ix  )+(iy  )*(nx+1)+(iz  )*(nx+1)*(ny  )])/dx
+           + (Tyz[(ix  )+(iy+1)*(nx  )+(iz  )*(nx  )*(ny+1)] - Tyz[(ix  )+(iy  )*(nx  )+(iz  )*(nx  )*(ny+1)])/dy);
+            dVzdt[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )] = (1-nu/nz)*dVzdt[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )] + Rz[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )];
+            Vz[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )] = Vz[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )] + dtV*dVzdt[ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )];
     }
 }
 __global__ void compute_P(DAT* Vx, DAT* Vy, DAT* Vz, DAT* P, const DAT dt, const DAT k, const DAT dx, const DAT dy, const DAT dz, const int nx, const int ny, const int nz){
