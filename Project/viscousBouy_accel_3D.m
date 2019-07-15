@@ -161,38 +161,38 @@ for it = 1:nt
     err = max([max(abs(Rx(:))), max(abs(Ry(:))),max(abs(Rz(:)))]);
     evol = [evol, err]; 
     if err<epsi, break; end
-%     if(mod(it,50)==0)
-%         %% Plot
-%         figure(2)
-%         clf
-%         subplot(221)
-%         semilogy(evol);
-% 
-%         subplot(222)
-%         temp1 = reshape(P,nx,ny,nz);
-%         imagesc(x(1:nx),y(1:nx:nx*ny),squeeze(temp1(:,:,(nz+1)/2))'),title("Pr")
-%         xlabel('x')
-%         ylabel('y')
-%         set(gca,'YDir','normal')
-%         colorbar
-%         
-%         subplot(223)
-%         temp2 = reshape(Vy,nx,ny+1,nz);
-%         imagesc(x(1:nx),ye(1:nx+1:(nx+1)*(ny+1)),squeeze(temp2(:,:,(nz+1)/2))'),title("Vy")
-%         set(gca,'YDir','normal')
-%         xlabel('x')
-%         ylabel('y')
-%         axis equal
-%         colorbar
-% 
-%         subplot(224)
-%         temp3 = reshape(Vx,nx+1,ny,nz);
-%         imagesc(x(1:nx),ye(1:nx:(nx+1)*(ny+1)),squeeze(temp3(:,:,(nz+1)/2))'),title("Vx")
-%         set(gca,'YDir','normal')
-%         axis equal
-%         colorbar
-%         drawnow
-%      end
+    if(mod(it,50)==0)
+        %% Plot
+        figure(2)
+        clf
+        subplot(221)
+        semilogy(evol);
+
+        subplot(222)
+        temp1 = reshape(P,nx,ny,nz);
+        imagesc(x(1:nx),y(1:nx:nx*ny),squeeze(temp1(:,:,(nz+1)/2))'),title("Pr")
+        xlabel('x')
+        ylabel('y')
+        set(gca,'YDir','normal')
+        colorbar
+        
+        subplot(223)
+        temp2 = reshape(Vy,nx,ny+1,nz);
+        imagesc(x(1:nx),ye(1:nx+1:(nx+1)*(ny+1)),squeeze(temp2(:,:,(nz+1)/2))'),title("Vy")
+        set(gca,'YDir','normal')
+        xlabel('x')
+        ylabel('y')
+        axis equal
+        colorbar
+
+        subplot(224)
+        temp3 = reshape(Vx,nx+1,ny,nz);
+        imagesc(x(1:nx),ye(1:nx:(nx+1)*(ny+1)),squeeze(temp3(:,:,(nz+1)/2))'),title("Vx")
+        set(gca,'YDir','normal')
+        axis equal
+        colorbar
+        drawnow
+     end
 end
 it
 %% 
