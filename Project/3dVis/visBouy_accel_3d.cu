@@ -79,29 +79,29 @@ double toc(){ return cpu_sec()-timer_start; }
 void   tim(const char *what, double n){ double s=toc(); printf("%s: %8.3f seconds",what,s);if(n>0)printf(", %8.3f GB/s", n/s); printf("\n"); }
 // MIN and MAX function //
 DAT device_MAX=0.0;
-#define NB_THREADS     (BLOCK_X*BLOCK_Y)
-#define blockId        (blockIdx.x  +  blockIdx.y *gridDim.x)
-#define threadId       (threadIdx.x + threadIdx.y*blockDim.x)
-#define isBlockMaster  (threadIdx.x==0 && threadIdx.y==0)
+#define NB_THREADS     (BLOCK_X*BLOCK_Y*BLOCK_Z)
+#define blockId        (blockIdx.x  +  blockIdx.y *gridDim.x + blockIdx.z*gridDim.y*gridDim.x)
+#define threadId       (threadIdx.x + threadIdx.y*blockDim.x + threadIdx.z*blockDim.y*blockDim.x)
+#define isBlockMaster  (threadIdx.x==0 && threadIdx.y==0 && threadIdx.z ==0)
 // maxval //
 #define block_max_init()  DAT __thread_maxval=0.0;
-#define __thread_max(A,nx_A,ny_A)  if (iy<ny_A && ix<nx_A){ __thread_maxval = max((__thread_maxval) , (A[ix + iy*nx_A])); } 
+#define __thread_max(A,nx_A,ny_A,nz_A)  if (iy<ny_A && ix<nx_A && iz<nz_A){ __thread_maxval = max((__thread_maxval) , (A[ix + iy*nx_A +iz*ny_A*nx_A])); } 
 
 __shared__ volatile  DAT __block_maxval;
-#define __block_max(A,nx_A,ny_A)  __thread_max(A,nx_A,ny_A);  if (isBlockMaster){ __block_maxval=0; }  __syncthreads(); \
+#define __block_max(A,nx_A,ny_A,nz_A)  __thread_max(A,nx_A,ny_A,nz_A);  if (isBlockMaster){ __block_maxval=0; }  __syncthreads(); \
                                   for (int i=0; i < (NB_THREADS); i++){ if (i==threadId){ __block_maxval = max(__block_maxval,__thread_maxval); }  __syncthreads(); }
 
-__global__ void __device_max_d(DAT*A, const int nx_A,const int ny_A, DAT*__device_maxval){
+__global__ void __device_max_d(DAT*A, const int nx_A,const int ny_A, const in nz_A, DAT*__device_maxval){
   block_max_init();
   for_ix for_iy
   // find the maxval for each block
-  __block_max(A,nx_A,ny_A);
+  __block_max(A,nx_A,ny_A,nz_A);
   __device_maxval[blockId] = __block_maxval;
 }
 
-#define __DEVICE_max(A,nx_A,ny_A)  __device_max_d<<<grid, block>>>(A##_d, nx_A,ny_A, __device_maxval_d); \
-                                   gather(__device_maxval,grid.x,grid.y); device_MAX=(DAT)0.0;           \
-                                   for (int i=0; i < (grid.x*grid.y); i++){                              \
+#define __DEVICE_max(A,nx_A,ny_A,nz_A)  __device_max_d<<<grid, block>>>(A##_d, nx_A, ny_A, nz_A, __device_maxval_d); \
+                                   gather(__device_maxval,grid.x,grid.y,grid.z); device_MAX=(DAT)0.0;           \
+                                   for (int i=0; i < (grid.x*grid.y*grid.z); i++){                              \
                                       device_MAX = max(device_MAX,__device_maxval_h[i]);                 \
                                    }                                                                     \
                                    A##_MAX = (device_MAX);
@@ -239,6 +239,10 @@ int main(){
     zeros(Rx   ,nx+1,ny  ,nz  );
     zeros(Ry   ,nx  ,ny+1,nz  );
     zeros(Rz   ,nx+1,ny  ,nz+1);
+    zeros(__device_maxval ,grid.x,grid.y,grid.z);
+    DAT Rx_MAX = 0.0;
+    DAT Ry_MAX = 0.0;
+    DAT Rz_MAX = 0.0;
     // Initial conditions
     init<<<grid,block>>>(x_d, y_d, z_d, rho_d, Lx, Ly, Lz, dx, dy, dz, nx, ny, nz);              cudaDeviceSynchronize();
     // Action
@@ -248,6 +252,7 @@ int main(){
         compute_T<<<grid,block>>>(Vx_d, Vy_d, Vz_d, Txx_d, Tyy_d, Tzz_d, Txy_d, Txz_d, Tyz_d, eta, dx, dy, dz, nx, ny, nz);  cudaDeviceSynchronize();
         compute_V<<<grid,block>>>(Vx_d, Vy_d, Vz_d, P_d, Txx_d, Tyy_d, Tzz_d, Txy_d, Txz_d, Tyz_d, dVxdt_d, dVydt_d, dVzdt_d,
                                   Rx_d, Ry_d, Rz_d, rho_d, dtV, g, dx ,dy ,dz ,nx ,ny ,nz );  cudaDeviceSynchronize();
+        __DEVICE_max(Rx,nx,ny,nz)
     }//it
     tim("Time (s), Effective MTP (GB/s)", mem*(nt-3)*4/1024./1024./1024.);
     save_info();
