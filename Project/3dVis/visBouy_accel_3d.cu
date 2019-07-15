@@ -36,7 +36,7 @@ const DAT rhoi= 10.0;
 const DAT g   = -10.0;
 const DAT eta = 1.0;
 const DAT nu  = 6.0;
-//const DAT epsi= 1.0e-6;
+const DAT epsi= 1.0e-6;
 // Numerics
 #define BLOCK_X 8
 #define BLOCK_Y 8
@@ -86,7 +86,7 @@ DAT device_MAX=0.0;
 #define isBlockMaster  (threadIdx.x==0 && threadIdx.y==0 && threadIdx.z ==0)
 // maxval //
 #define block_max_init()  DAT __thread_maxval=0.0;
-#define __thread_max(A,nx_A,ny_A,nz_A)  if (iy<ny_A && ix<nx_A && iz<nz_A){ __thread_maxval = max((__thread_maxval) , (A[ix + iy*nx_A +iz*ny_A*nx_A])); } 
+#define __thread_max(A,nx_A,ny_A,nz_A)  if (iy<ny_A && ix<nx_A && iz<nz_A){ __thread_maxval = max((__thread_maxval) , abs(A[ix + iy*nx_A +iz*ny_A*nx_A])); } 
 
 __shared__ volatile  DAT __block_maxval;
 #define __block_max(A,nx_A,ny_A,nz_A)  __thread_max(A,nx_A,ny_A,nz_A);  if (isBlockMaster){ __block_maxval=0; }  __syncthreads(); \
@@ -243,9 +243,9 @@ int main(){
     zeros(Ry   ,nx  ,ny+1,nz  );
     zeros(Rz   ,nx+1,ny  ,nz+1);
     zeros(__device_maxval ,grid.x,grid.y,grid.z);
-    DAT Rx_MAX = 0.0;
-    //DAT Ry_MAX = 0.0;
-    //DAT Rz_MAX = 0.0;
+    DAT Rx_MAX = 1.0;
+    DAT Ry_MAX = 0.0;
+    DAT Rz_MAX = 0.0;
     // Initial conditions
     init<<<grid,block>>>(x_d, y_d, z_d, rho_d, Lx, Ly, Lz, dx, dy, dz, nx, ny, nz);              cudaDeviceSynchronize();
     // Action
@@ -256,8 +256,14 @@ int main(){
         compute_V<<<grid,block>>>(Vx_d, Vy_d, Vz_d, P_d, Txx_d, Tyy_d, Tzz_d, Txy_d, Txz_d, Tyz_d, dVxdt_d, dVydt_d, dVzdt_d,
                                   Rx_d, Ry_d, Rz_d, rho_d, dtV, g, dx ,dy ,dz ,nx ,ny ,nz );  cudaDeviceSynchronize();
         __DEVICE_max(Rx,nx,ny,nz);
-        if (it%nmax==0){ printf("max(Rx)=%1.3e \n", Rx_MAX); }
-        if (Rx_MAX < 5.0E-4){break;}
+        __DEVICE_max(Ry,nx,ny,nz);
+        __DEVICE_max(Rz,nx,ny,nz);
+        if (it%nmax==0){ printf("max(Rx,Ry,Rz)=%1.3e, %1.3e, %1.3e \n", Rx_MAX, Ry_MAX, Rz_MAX); }
+        if (Rx_MAX < epsi && Ry_MAX < epsi && Rz_MAX < epsi && it > nmax){
+            printf("Broke on iteration %d \n",it);
+            printf("max(Rx,Ry,Rz)=%1.3e, %1.3e, %1.3e \n", Rx_MAX, Ry_MAX, Rz_MAX);
+            break;
+        }
     }//it
     tim("Time (s), Effective MTP (GB/s)", mem*(nt-3)*4/1024./1024./1024.);
     save_info();
@@ -265,6 +271,9 @@ int main(){
     SaveArray(Vx,nx+1,ny  ,nz  ,"Vx");
     SaveArray(Vy,nx  ,ny+1,nz  ,"Vy");
     SaveArray(Vz,nx  ,ny  ,nz+1,"Vz");
+    SaveArray(Rx,nx+1,ny  ,nz  ,"Rx");
+    SaveArray(Ry,nx  ,ny+1,nz  ,"Ry");
+    SaveArray(Rz,nx  ,ny  ,nz+1,"Rz");
     SaveArray(Txx,nx  ,ny  ,nz  ,"Txx");
     SaveArray(Tyy,nx  ,ny  ,nz  ,"Tyy");
     SaveArray(Tzz,nx  ,ny  ,nz  ,"Tzz");

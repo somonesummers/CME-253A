@@ -7,6 +7,9 @@ id = fopen('0_P.res' ); P  = fread(id,DAT); fclose(id); Ps  = reshape(P ,nx  ,ny
 id = fopen('0_Vx.res'); Vx = fread(id,DAT); fclose(id); Vxs = reshape(Vx,nx+1,ny  ,nz  );
 id = fopen('0_Vy.res'); Vy = fread(id,DAT); fclose(id); Vys = reshape(Vy,nx  ,ny+1,nz  );
 id = fopen('0_Vz.res'); Vz = fread(id,DAT); fclose(id); Vzs = reshape(Vz,nx  ,ny  ,nz+1);
+id = fopen('0_Rx.res'); Rx = fread(id,DAT); fclose(id); Rxs = reshape(Vx,nx+1,ny  ,nz  );
+id = fopen('0_Ry.res'); Ry = fread(id,DAT); fclose(id); Rys = reshape(Vy,nx  ,ny+1,nz  );
+id = fopen('0_Rz.res'); Rz = fread(id,DAT); fclose(id); Rzs = reshape(Vz,nx  ,ny  ,nz+1);
 id = fopen('0_Txx.res'); Txx = fread(id,DAT); fclose(id); Txxs = reshape(Txx,nx  ,ny  ,nz  );
 id = fopen('0_Tyy.res'); Tyy = fread(id,DAT); fclose(id); Tyys = reshape(Tyy,nx  ,ny  ,nz  );
 id = fopen('0_Tzz.res'); Tzz = fread(id,DAT); fclose(id); Tzzs = reshape(Tyy,nx  ,ny  ,nz  );
