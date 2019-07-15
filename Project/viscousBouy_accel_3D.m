@@ -1,6 +1,6 @@
-%wave_2D_l
+%wave_3D_l
 
-clear % Wave 2D loop
+clear % Wave 3D loop
 % Physics
 Lx   = 10;
 Ly   = 10;
@@ -22,7 +22,7 @@ GRID_Z  = 4;
 nx  = BLOCK_X*GRID_X - OVERLENGTH_X;
 ny  = BLOCK_Y*GRID_Y - OVERLENGTH_Y;
 nz  = BLOCK_Z*GRID_Z - OVERLENGTH_Z;
-nt  = 1000;
+nt  = 20000;
 dx  = Lx/nx;
 dy  = Ly/ny;
 dz  = Lz/nz;
@@ -127,7 +127,7 @@ for it = 1:nt
     for ix = 1:nx
         for iyM = 1:ny, iy = iyM-1;
              for izM = 1:nz, iz = izM-1;
-                 if ix > 2
+                 if ix > 1
                     Rx(ix+(iy)*(nx+1)+(iz)*(nx+1)*ny) = 1 * (...
                         -1*(P( ix +(iy  )* nx   +(iz  )* nx   * ny   ) -   P((ix-1)+(iy  )* nx   +(iz  )* nx   * ny   ))/dx...             
                        + (Txx( ix +(iy  )* nx   +(iz  )* nx   * ny   ) - Txx((ix-1)+(iy  )* nx   +(iz  )* nx   * ny   ))/dx...        
@@ -136,7 +136,7 @@ for it = 1:nt
                     dVxdt(ix+(iy)*(nx+1)+(iz)*(nx+1)*ny) = (1-nu/nx)*dVxdt(ix+(iy)*(nx+1)+(iz)*(nx+1)*ny) + Rx(ix+(iy)*(nx+1)+(iz)*(nx+1)*ny);
                     Vx(ix+(iy)*(nx+1)+(iz)*(nx+1)*ny) = Vx(ix+(iy)*(nx+1)+(iz)*(nx+1)*ny) + dtV*dVxdt(ix+(iy)*(nx+1)+(iz)*(nx+1)*ny);
                  end
-                 if iyM > 2
+                 if iyM > 1
                     Ry(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) = 1 * (...
                         -1*(P((ix  )+(iy  )* nx   +(iz  )* nx   * ny   ) -   P((ix  )+(iy-1)* nx   +(iz  )* nx   * ny   ))/dy...             
                        + (Tyy((ix  )+(iy  )* nx   +(iz  )* nx   * ny   ) - Tyy((ix  )+(iy-1)* nx   +(iz  )* nx   * ny   ))/dy...        
@@ -146,7 +146,7 @@ for it = 1:nt
                     dVydt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) = (1-nu/ny)*dVydt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) + Ry(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1));
                     Vy(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) = Vy(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1)) + dtV*dVydt(ix+(iy)*(nx  )+(iz)*(nx  )*(ny+1));
                  end
-                 if izM > 2
+                 if izM > 1
                     Rz(ix+(iy)*(nx  )+(iz)*(nx  )*(ny  )) = 1 * (...
                         -1*(P((ix  )+(iy  )* nx   +(iz  )* nx   * ny   ) -   P((ix  )+(iy  )* nx   +(iz-1)* nx   * ny   ))/dz...             
                        + (Tzz((ix  )+(iy  )* nx   +(iz  )* nx   * ny   ) - Tzz((ix  )+(iy  )* nx   +(iz-1)* nx   * ny   ))/dz...        

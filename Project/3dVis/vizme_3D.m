@@ -1,6 +1,6 @@
 clear
 % Load the DATA and infos
-mat = load('p_l_v.mat');
+mat = load('../p_l_v.mat');
 nxy = load('0_nxyz.inf');  PRECIS=nxy(1); nx=nxy(2); ny=nxy(3); nz=nxy(4);
 if (PRECIS==8), DAT = 'double';  elseif (PRECIS==4), DAT = 'single';  end 
 id = fopen('0_P.res' ); P  = fread(id,DAT); fclose(id); Ps  = reshape(P ,nx  ,ny  ,nz  );
@@ -87,3 +87,35 @@ figure(2)
         set(gca,'YDir','normal')
         axis equal
         colorbar
+        
+figure(3)
+        clf
+        subplot(221)
+        semilogy(mat.evol);
+        title('Difference');
+
+        subplot(222)
+        temp1 = reshape(mat.P-P,nx,ny,nz);
+        imagesc(squeeze(temp1(:,:,(nz+1)/2))'),title("Pr")
+        xlabel('x')
+        ylabel('y')
+        set(gca,'YDir','normal')
+        colorbar
+        
+        subplot(223)
+        temp2 = reshape(mat.Vy-Vy,nx,ny+1,nz);
+        imagesc(squeeze(temp2(:,:,(nz+1)/2))'),title("Vy")
+        set(gca,'YDir','normal')
+        xlabel('x')
+        ylabel('y')
+        axis equal
+        colorbar
+
+        subplot(224)
+        temp3 = reshape(mat.Vx-Vx,nx+1,ny,nz);
+        imagesc(squeeze(temp3(:,:,(nz+1)/2))'),title("Vx")
+        set(gca,'YDir','normal')
+        axis equal
+        colorbar
+        
+        
