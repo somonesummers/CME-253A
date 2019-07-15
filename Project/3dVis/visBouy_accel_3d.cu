@@ -77,6 +77,35 @@ double cpu_sec(){ struct timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+1e
 void   tic(){ timer_start = cpu_sec(); }
 double toc(){ return cpu_sec()-timer_start; }
 void   tim(const char *what, double n){ double s=toc(); printf("%s: %8.3f seconds",what,s);if(n>0)printf(", %8.3f GB/s", n/s); printf("\n"); }
+// MIN and MAX function //
+DAT device_MAX=0.0;
+#define NB_THREADS     (BLOCK_X*BLOCK_Y)
+#define blockId        (blockIdx.x  +  blockIdx.y *gridDim.x)
+#define threadId       (threadIdx.x + threadIdx.y*blockDim.x)
+#define isBlockMaster  (threadIdx.x==0 && threadIdx.y==0)
+// maxval //
+#define block_max_init()  DAT __thread_maxval=0.0;
+#define __thread_max(A,nx_A,ny_A)  if (iy<ny_A && ix<nx_A){ __thread_maxval = max((__thread_maxval) , (A[ix + iy*nx_A])); } 
+
+__shared__ volatile  DAT __block_maxval;
+#define __block_max(A,nx_A,ny_A)  __thread_max(A,nx_A,ny_A);  if (isBlockMaster){ __block_maxval=0; }  __syncthreads(); \
+                                  for (int i=0; i < (NB_THREADS); i++){ if (i==threadId){ __block_maxval = max(__block_maxval,__thread_maxval); }  __syncthreads(); }
+
+__global__ void __device_max_d(DAT*A, const int nx_A,const int ny_A, DAT*__device_maxval){
+  block_max_init();
+  for_ix for_iy
+  // find the maxval for each block
+  __block_max(A,nx_A,ny_A);
+  __device_maxval[blockId] = __block_maxval;
+}
+
+#define __DEVICE_max(A,nx_A,ny_A)  __device_max_d<<<grid, block>>>(A##_d, nx_A,ny_A, __device_maxval_d); \
+                                   gather(__device_maxval,grid.x,grid.y); device_MAX=(DAT)0.0;           \
+                                   for (int i=0; i < (grid.x*grid.y); i++){                              \
+                                      device_MAX = max(device_MAX,__device_maxval_h[i]);                 \
+                                   }                                                                     \
+                                   A##_MAX = (device_MAX);
+
 // --------------------------------------------------------------------- //
 // Computing physics kernels
 __global__ void init(DAT* x, DAT* y, DAT* z, DAT* rho, const DAT Lx, const DAT Ly, const DAT Lz, const DAT dx, const DAT dy, const DAT dz, const int nx, const int ny, const int nz){
