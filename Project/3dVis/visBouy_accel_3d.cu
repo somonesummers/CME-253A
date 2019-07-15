@@ -47,7 +47,8 @@ const DAT nu  = 6.0;
 const int nx = BLOCK_X*GRID_X - OVERLENGTH_X;
 const int ny = BLOCK_Y*GRID_Y - OVERLENGTH_Y;
 const int nz = BLOCK_Z*GRID_Z - OVERLENGTH_Z;
-const int nt = 1000;
+const int nt = 20000;
+const int nmax = 100;
 const DAT dx = Lx/((DAT)nx);
 const DAT dy = Ly/((DAT)ny);
 const DAT dz = Lz/((DAT)nz);
@@ -91,9 +92,11 @@ __shared__ volatile  DAT __block_maxval;
 #define __block_max(A,nx_A,ny_A,nz_A)  __thread_max(A,nx_A,ny_A,nz_A);  if (isBlockMaster){ __block_maxval=0; }  __syncthreads(); \
                                   for (int i=0; i < (NB_THREADS); i++){ if (i==threadId){ __block_maxval = max(__block_maxval,__thread_maxval); }  __syncthreads(); }
 
-__global__ void __device_max_d(DAT*A, const int nx_A,const int ny_A, const in nz_A, DAT*__device_maxval){
+__global__ void __device_max_d(DAT*A, const int nx_A,const int ny_A, const int nz_A, DAT*__device_maxval){
   block_max_init();
-  for_ix for_iy
+  int ix = blockIdx.x*blockDim.x + threadIdx.x;
+  int iy = blockIdx.y*blockDim.y + threadIdx.y;
+  int iz = blockIdx.z*blockDim.z + threadIdx.z;
   // find the maxval for each block
   __block_max(A,nx_A,ny_A,nz_A);
   __device_maxval[blockId] = __block_maxval;
@@ -241,8 +244,8 @@ int main(){
     zeros(Rz   ,nx+1,ny  ,nz+1);
     zeros(__device_maxval ,grid.x,grid.y,grid.z);
     DAT Rx_MAX = 0.0;
-    DAT Ry_MAX = 0.0;
-    DAT Rz_MAX = 0.0;
+    //DAT Ry_MAX = 0.0;
+    //DAT Rz_MAX = 0.0;
     // Initial conditions
     init<<<grid,block>>>(x_d, y_d, z_d, rho_d, Lx, Ly, Lz, dx, dy, dz, nx, ny, nz);              cudaDeviceSynchronize();
     // Action
@@ -252,7 +255,9 @@ int main(){
         compute_T<<<grid,block>>>(Vx_d, Vy_d, Vz_d, Txx_d, Tyy_d, Tzz_d, Txy_d, Txz_d, Tyz_d, eta, dx, dy, dz, nx, ny, nz);  cudaDeviceSynchronize();
         compute_V<<<grid,block>>>(Vx_d, Vy_d, Vz_d, P_d, Txx_d, Tyy_d, Tzz_d, Txy_d, Txz_d, Tyz_d, dVxdt_d, dVydt_d, dVzdt_d,
                                   Rx_d, Ry_d, Rz_d, rho_d, dtV, g, dx ,dy ,dz ,nx ,ny ,nz );  cudaDeviceSynchronize();
-        __DEVICE_max(Rx,nx,ny,nz)
+        __DEVICE_max(Rx,nx,ny,nz);
+        if (it%nmax==0){ printf("max(Rx)=%1.3e \n", Rx_MAX); }
+        if (Rx_MAX < 5.0E-4){break;}
     }//it
     tim("Time (s), Effective MTP (GB/s)", mem*(nt-3)*4/1024./1024./1024.);
     save_info();
