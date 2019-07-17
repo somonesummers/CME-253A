@@ -219,7 +219,7 @@ int main(){
     gpu_id = GPU_ID; cudaSetDevice(gpu_id); cudaGetDevice(&gpu_id);
     cudaDeviceReset(); cudaDeviceSetCacheConfig(cudaFuncCachePreferL1);  // set L1 to prefered
     printf("Process uses GPU with id %d.\n",gpu_id);
-    printf("%dx%dx%d, %1.3f GB, %d iterations.\n", nx,ny,nz, 5*mem/1024./1024./1024., nt);
+    printf("%dx%dx%d, %1.3f GB, %d iterations.\n", nx,ny,nz, 20*mem/1024./1024./1024., nt);
     printf("Launching (%dx%dx%d) grid of (%dx%dx%d) blocks.\n", grid.x, grid.y, grid.z, block.x, block.y, block.z);
     // Initial arrays
     zeros(x    ,nx  ,ny  ,nz  );
@@ -265,7 +265,7 @@ int main(){
             break;
         }
     }//it
-    tim("Time (s), Effective MTP (GB/s)", mem*(nt-3)*4/1024./1024./1024.);
+    tim("Time (s), Effective MTP (GB/s)", mem*(nt-3)*20/1024./1024./1024.);
     save_info();
     SaveArray(P ,nx  ,ny  ,nz  ,"P" );
     SaveArray(Vx,nx+1,ny  ,nz  ,"Vx");
