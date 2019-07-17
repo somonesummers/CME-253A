@@ -265,7 +265,7 @@ int main(){
             break;
         }
     }//it
-    tim("Time (s), Effective MTP (GB/s)", mem*(nt-3)*20/1024./1024./1024.);
+    tim("Time (s), Effective MTP (GB/s)", mem*(it-3)*20/1024./1024./1024.);
     save_info();
     SaveArray(P ,nx  ,ny  ,nz  ,"P" );
     SaveArray(Vx,nx+1,ny  ,nz  ,"Vx");
