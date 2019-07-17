@@ -1,0 +1,26 @@
+Double
+31x31x31, 0.001 GB, 20000 iterations.
+Launching (4x4x4) grid of (8x8x8) blocks.
+Time (s), Effective MTP (GB/s):    1.042 seconds,   17.043 GB/s
+63x63x63, 0.009 GB, 20000 iterations.
+Launching (8x8x8) grid of (8x8x8) blocks.
+Time (s), Effective MTP (GB/s):    3.877 seconds,   38.437 GB/s
+127x127x127, 0.076 GB, 20000 iterations.
+Launching (16x16x16) grid of (8x8x8) blocks.
+Time (s), Effective MTP (GB/s):  101.678 seconds,   12.006 GB/s
+255x255x255, 0.618 GB, 20000 iterations.
+Launching (32x32x32) grid of (8x8x8) blocks.
+Time (s), Effective MTP (GB/s): 1235.564 seconds,    7.998 GB/s
+Single
+31x31x31, 0.001 GB, 20000 iterations.
+Launching (4x4x4) grid of (8x8x8) blocks.
+Time (s), Effective MTP (GB/s):    3.591 seconds,    2.472 GB/s
+63x63x63, 0.005 GB, 20000 iterations.
+Launching (8x8x8) grid of (8x8x8) blocks.
+Time (s), Effective MTP (GB/s):   10.562 seconds,    7.054 GB/s
+127x127x127, 0.038 GB, 20000 iterations.
+Launching (16x16x16) grid of (8x8x8) blocks.
+Time (s), Effective MTP (GB/s):   65.763 seconds,    9.281 GB/s
+255x255x255, 0.309 GB, 20000 iterations.
+Launching (32x32x32) grid of (8x8x8) blocks.
+Time (s), Effective MTP (GB/s):  521.838 seconds,    9.468 GB/s
