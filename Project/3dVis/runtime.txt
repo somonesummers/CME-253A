@@ -1,16 +1,39 @@
 Double
-31x31x31, 0.001 GB, 20000 iterations.
+[psummers@cees-mazama-gpu-3 3dVis]$ ./d4.out
+Process uses GPU with id 0.
+31x31x31, 0.004 GB, 200000 iterations.
 Launching (4x4x4) grid of (8x8x8) blocks.
-Time (s), Effective MTP (GB/s):    1.042 seconds,   17.043 GB/s
-63x63x63, 0.009 GB, 20000 iterations.
+Broke on iteration 3813 
+max(Rx,Ry,Rz)=6.928e-14, 3.010e-07, 7.350e-14 
+Time (s), Effective MTP (GB/s):    0.963 seconds,  351.151 GB/s
+[psummers@cees-mazama-gpu-3 3dVis]$ ./d8.out
+Process uses GPU with id 0.
+63x63x63, 0.037 GB, 200000 iterations.
 Launching (8x8x8) grid of (8x8x8) blocks.
-Time (s), Effective MTP (GB/s):    3.877 seconds,   38.437 GB/s
-127x127x127, 0.076 GB, 20000 iterations.
+Broke on iteration 3385 
+max(Rx,Ry,Rz)=1.827e-08, 1.462e-07, 1.827e-08 
+Time (s), Effective MTP (GB/s):    3.868 seconds,  651.570 GB/s
+[psummers@cees-mazama-gpu-3 3dVis]$ ./d16.out
+Process uses GPU with id 0.
+127x127x127, 0.305 GB, 200000 iterations.
 Launching (16x16x16) grid of (8x8x8) blocks.
-Time (s), Effective MTP (GB/s):  101.678 seconds,   12.006 GB/s
-255x255x255, 0.618 GB, 20000 iterations.
+Broke on iteration 13090 
+max(Rx,Ry,Rz)=8.502e-12, 2.763e-07, 7.733e-12 
+Time (s), Effective MTP (GB/s):  101.279 seconds,  788.827 GB/s
+[psummers@cees-mazama-gpu-3 3dVis]$ ./d24.out
+Process uses GPU with id 0.
+191x191x191, 1.038 GB, 200000 iterations.
+Launching (24x24x24) grid of (8x8x8) blocks.
+Broke on iteration 19684 
+max(Rx,Ry,Rz)=2.411e-11, 1.276e-07, 2.221e-11 
+Time (s), Effective MTP (GB/s):  511.154 seconds,  799.550 GB/s
+[psummers@cees-mazama-gpu-3 3dVis]$ ./d32.out
+Process uses GPU with id 0.
+255x255x255, 2.471 GB, 200000 iterations.
 Launching (32x32x32) grid of (8x8x8) blocks.
-Time (s), Effective MTP (GB/s): 1235.564 seconds,    7.998 GB/s
+Broke on iteration 26278 
+max(Rx,Ry,Rz)=4.809e-11, 8.868e-08, 4.398e-11 
+Time (s), Effective MTP (GB/s): 1625.620 seconds,  798.720 GB/s
 Single
 31x31x31, 0.001 GB, 20000 iterations.
 Launching (4x4x4) grid of (8x8x8) blocks.

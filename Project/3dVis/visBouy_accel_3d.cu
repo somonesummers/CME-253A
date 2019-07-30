@@ -6,7 +6,7 @@
 #include "math.h"
 #include "cuda.h"
 
-//#define USE_SINGLE_PRECISION    /* Comment this line using "//" if you want to use double precision.  */
+#define USE_SINGLE_PRECISION    /* Comment this line using "//" if you want to use double precision.  */
 #ifdef USE_SINGLE_PRECISION
 #define DAT     float
 #define PRECIS  4
@@ -42,12 +42,12 @@ const DAT epsi= 1.0e-6;
 #define BLOCK_Y 8
 #define BLOCK_Z 8
 #define GRID_X  4
-#define GRID_Y  4 
-#define GRID_Z  4 
+#define GRID_Y  4
+#define GRID_Z  4
 const int nx = BLOCK_X*GRID_X - OVERLENGTH_X;
 const int ny = BLOCK_Y*GRID_Y - OVERLENGTH_Y;
 const int nz = BLOCK_Z*GRID_Z - OVERLENGTH_Z;
-const int nt = 20000;
+const int nt = 200000;
 const int nmax = 100;
 const DAT dx = Lx/((DAT)nx);
 const DAT dy = Ly/((DAT)ny);
@@ -258,14 +258,14 @@ int main(){
         __DEVICE_max(Rx,nx,ny,nz);
         __DEVICE_max(Ry,nx,ny,nz);
         __DEVICE_max(Rz,nx,ny,nz);
-        if (it%nmax==0){ printf("max(Rx,Ry,Rz)=%1.3e, %1.3e, %1.3e \n", Rx_MAX, Ry_MAX, Rz_MAX); }
+//        if (it%nmax==0){ printf("max(Rx,Ry,Rz)=%1.3e, %1.3e, %1.3e \n", Rx_MAX, Ry_MAX, Rz_MAX); }
         if (Rx_MAX < epsi && Ry_MAX < epsi && Rz_MAX < epsi && it > nmax){
             printf("Broke on iteration %d \n",it);
             printf("max(Rx,Ry,Rz)=%1.3e, %1.3e, %1.3e \n", Rx_MAX, Ry_MAX, Rz_MAX);
             break;
         }
     }//it
-    tim("Time (s), Effective MTP (GB/s)", mem*(it-3)*20/1024./1024./1024.);
+    tim("Time (s), Effective MTP (GB/s)",20*mem*(it-3)*20/1024./1024./1024.);
     save_info();
     SaveArray(P ,nx  ,ny  ,nz  ,"P" );
     SaveArray(Vx,nx+1,ny  ,nz  ,"Vx");
