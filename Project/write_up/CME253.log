@@ -1,4 +1,4 @@
-This is LuaTeX, Version 1.07.0 (TeX Live 2018)  (format=lualatex 2018.4.16)  30 JUL 2019 16:18
+This is LuaTeX, Version 1.07.0 (TeX Live 2018)  (format=lualatex 2018.4.16)  31 JUL 2019 15:08
  restricted system commands enabled.
 **"/Users/paulsummers/Documents/CME 253A/Project/write_up/CME253.tex"
 ("/Users/paulsummers/Documents/CME 253A/Project/write_up/CME253.tex"
@@ -35,7 +35,7 @@ Inserting `luaotfload.aux.set_capheight' at position 3 in `luaotfload.patch_font
 '.
 Inserting `luaotfload.rewrite_fontname' at position 4 in `luaotfload.patch_font'
 .
-luaotfload | main : initialization completed in 0.110 seconds
+luaotfload | main : initialization completed in 0.919 seconds
 Babel <3.18> and hyphenation patterns for 1 language(s) loaded.
 (/Users/paulsummers/Documents/Latex/header.tex
 (/usr/local/texlive/2018/texmf-dist/tex/latex/base/article.cls
@@ -1160,56 +1160,51 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 <../3dvis/plots2d.png, id=17, 957.8184pt x 738.5994pt>
 File: ../3dvis/plots2d.png Graphic file (type png)
 <use ../3dvis/plots2d.png>
-Package luatex.def Info: ../3dvis/plots2d.png  used on input line 58.
-(luatex.def)             Requested size: 344.005pt x 265.26445pt.
+Package luatex.def Info: ../3dvis/plots2d.png  used on input line 59.
+(luatex.def)             Requested size: 206.40038pt x 159.15642pt.
 <../3dvis/plots.png, id=18, 957.8184pt x 738.5994pt>
 File: ../3dvis/plots.png Graphic file (type png)
 <use ../3dvis/plots.png>
-Package luatex.def Info: ../3dvis/plots.png  used on input line 62.
-(luatex.def)             Requested size: 344.005pt x 265.26445pt.
- [2<../3dvis/plots2d.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 65--66
-
- []
-
-<../3dvis/runTimes.png, id=24, 562.2606pt x 421.575pt>
+Package luatex.def Info: ../3dvis/plots.png  used on input line 60.
+(luatex.def)             Requested size: 206.40038pt x 159.15642pt.
+<../3dvis/runTimes.png, id=19, 562.2606pt x 421.575pt>
 File: ../3dvis/runTimes.png Graphic file (type png)
 <use ../3dvis/runTimes.png>
-Package luatex.def Info: ../3dvis/runTimes.png  used on input line 67.
-(luatex.def)             Requested size: 344.005pt x 257.9323pt.
+Package luatex.def Info: ../3dvis/runTimes.png  used on input line 69.
+(luatex.def)             Requested size: 258.00539pt x 193.45082pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 69--70
 
- []
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[3<../3dvis/plots.png><../3dvis/runTimes.png>]
-<../3dvis/resids.png, id=28, 562.2606pt x 421.575pt>
+<../3dvis/resids.png, id=20, 562.2606pt x 421.575pt>
 File: ../3dvis/resids.png Graphic file (type png)
 <use ../3dvis/resids.png>
-Package luatex.def Info: ../3dvis/resids.png  used on input line 71.
-(luatex.def)             Requested size: 344.005pt x 257.9323pt.
+Package luatex.def Info: ../3dvis/resids.png  used on input line 77.
+(luatex.def)             Requested size: 258.00539pt x 193.45082pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 73--74
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
- []
-
-<../3dvis/iterations.png, id=29, 562.2606pt x 421.575pt>
+<../3dvis/iterations.png, id=21, 562.2606pt x 421.575pt>
 File: ../3dvis/iterations.png Graphic file (type png)
 <use ../3dvis/iterations.png>
-Package luatex.def Info: ../3dvis/iterations.png  used on input line 75.
-(luatex.def)             Requested size: 344.005pt x 257.9323pt.
-[4<../3dvis/resids.png><../3dvis/iterations.png>] [5] (./CME253.aux))
+Package luatex.def Info: ../3dvis/iterations.png  used on input line 85.
+(luatex.def)             Requested size: 258.00539pt x 193.45082pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[2<../3dvis/plots2d.png><../3dvis/plots.png>] [3<../3dvis/runTimes.png><../3dvis
+/resids.png>] [4<../3dvis/iterations.png>] (./CME253.aux))
 
 Here is how much of LuaTeX's memory you used:
- 24564 strings out of 494413
+ 24567 strings out of 494413
  100000,662416 words of node,token memory allocated
  486 words of node memory still in use:
    3 hlist, 1 vlist, 1 rule, 2 glue, 26 attribute, 51 glue_spec, 26 attribute_li
 st, 1 write nodes
-   avail lists: 2:342,3:78,4:25,5:512,6:15,7:1689,8:69,9:459,10:8,11:83
- 27916 multiletter control sequences out of 65536+600000
+   avail lists: 2:367,3:90,4:36,5:812,6:20,7:3343,8:69,9:409,10:6,11:225
+ 27919 multiletter control sequences out of 65536+600000
  64 fonts using 9556391 bytes
- 57i,12n,59p,592b,306s stack positions out of 5000i,500n,10000p,200000b,100000s
+ 57i,12n,59p,834b,315s stack positions out of 5000i,500n,10000p,200000b,100000s
 </usr/local/texlive/2018/texmf-dist/fonts/opentype/public/lm/lmroman12-regular.o
 tf></Users/paulsummers/Library/Fonts/NationalPark-Heavy.otf></Users/paulsummers/
 Library/Fonts/NationalPark-Regular.otf></usr/local/texlive/2018/texmf-dist/fonts
@@ -1220,10 +1215,10 @@ public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/pub
 lic/amsfonts/cm/cmr8.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/
 amsfonts/cm/cmsy10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/am
 sfonts/cm/cmsy8.pfb>
-Output written on CME253.pdf (5 pages, 495421 bytes).
+Output written on CME253.pdf (4 pages, 500356 bytes).
 
-PDF statistics: 77 PDF objects out of 1000 (max. 8388607)
- 48 compressed objects within 1 object stream
+PDF statistics: 74 PDF objects out of 1000 (max. 8388607)
+ 46 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 131072)
  16 words of extra memory for PDF output out of 10000 (max. 100000000)
 
